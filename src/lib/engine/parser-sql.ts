@@ -101,14 +101,14 @@ export function parseSqlDdl(
       } else if (def.resource === "constraint") {
         const t = def.constraint_type;
         if (t === "primary key") {
-          for (const c of def.definition ?? []) pkCols.add(c.column);
+          for (const c of def.definition ?? []) pkCols.add(colName(c));
         } else if (t === "unique" || t === "unique key") {
-          for (const c of def.definition ?? []) uniqueCols.add(c.column);
+          for (const c of def.definition ?? []) uniqueCols.add(colName(c));
         } else if (t === "FOREIGN KEY" || t === "foreign key") {
-          const localCols = (def.definition ?? []).map((c: any) => c.column);
+          const localCols = (def.definition ?? []).map((c: any) => colName(c));
           const ref = def.reference_definition;
           const refTable = ref?.table?.[0]?.table ?? ref?.table;
-          const refCols = (ref?.definition ?? []).map((c: any) => c.column);
+          const refCols = (ref?.definition ?? []).map((c: any) => colName(c));
           localCols.forEach((c: string, i: number) => {
             fks[c] = { table: refTable, column: refCols[i] ?? "id" };
           });
