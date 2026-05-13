@@ -1,5 +1,6 @@
 // SQL DDL parser → UnifiedSchema. Uses node-sql-parser (pure JS, Worker-safe).
-import { Parser } from "node-sql-parser";
+import pkg from "node-sql-parser";
+const { Parser } = pkg;
 import type { Column, ColumnKind, Table, UnifiedSchema } from "./types";
 
 const parser = new Parser();
