@@ -70,9 +70,12 @@ export function parseSqlDdl(
     const uniqueCols = new Set<string>();
     const fks: Record<string, { table: string; column: string }> = {};
 
+    const colName = (c: any): string =>
+      typeof c === "string" ? c : (c?.column ?? c?.expr?.column ?? String(c));
+
     for (const def of stmt.create_definitions ?? []) {
       if (def.resource === "column") {
-        const name = def.column?.column;
+        const name = colName(def.column);
         const rawType = def.definition?.dataType ?? "unknown";
         const length = def.definition?.length;
         const col: Column = {
