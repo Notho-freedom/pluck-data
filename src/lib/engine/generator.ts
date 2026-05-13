@@ -20,7 +20,7 @@ function makeFaker(locale: string | undefined, seed: number | undefined): Faker 
 }
 
 function pickByName(faker: Faker, col: Column): unknown {
-  const n = col.name.toLowerCase();
+  const n = String(col.name ?? "").toLowerCase();
   // Fast pattern matches by column name
   if (n === "id" || n.endsWith("_id") || col.kind === "uuid") return faker.string.uuid();
   if (/email/.test(n)) return faker.internet.email();
