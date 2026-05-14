@@ -1,206 +1,105 @@
 
-# DataSeed API — Plateforme de génération de données de démo
+# Finalisation DataSeed API
 
-## Concept
+## 1. Bug critique à corriger d'abord (ce que tu vois dans le résultat)
 
-Une **API** (le produit principal) qui prend en entrée un schéma (SQL DDL ou JSON Schema) et retourne des données de démonstration cohérentes, avec relations préservées (FK), dans le format demandé. Une **interface web** sert de documentation, playground de test, et console de gestion des clés API — mais consomme la même API publique que les développeurs externes.
+Cause: `node-sql-parser` retourne désormais les noms de colonnes comme `{ expr: { value: 'id' } }`. Le parser actuel fait `String(c)` → `[object Object]`. Ensuite, `mapType` ne reconnaît plus le type (objet aussi) → kind devient `unknown` → générateur retombe sur des lorem mais surtout les colonnes portent toutes le même nom `[object Object]` donc se collisionnent et n'écrivent qu'une seule valeur (la dernière, un timestamp pour `created_at`).
 
----
+Correctif (`src/lib/engine/parser-sql.ts`):
 
-## 1. Stack technique
+- Helper `colName` robuste qui descend `column.expr.value`, `column.value`, `column.column`, ou `String`.
+- Helper `extractDataType` qui gère `definition.dataType` quand c'est un objet imbriqué.
+- Tester avec le schéma users/messages — vérifier que `INSERT INTO "users" ("id", "email", "full_name", "created_at") VALUES ('uuid', 'mail@…', 'Jean Dupont', '2024…')` est correct.
+- Bonus: parser `REFERENCES users(id)` inline (clé étrangère) — déjà géré, vérifier qu'il fonctionne avec la nouvelle extraction.
 
-- **Frontend + API**: TanStack Start (déjà en place) — server routes sous `src/routes/api/` pour les endpoints publics, server functions pour la console.
-- **Backend**: Lovable Cloud (auth, base Postgres pour comptes/clés/quotas/logs).
-- **Parsing SQL**: `node-sql-parser` (compatible Workers, supporte MySQL/Postgres/SQLite DDL).
-- **Validation JSON Schema**: `ajv`.
-- **Génération de fake data**: `@faker-js/faker` (locales fr/en/es...).
-- **APIs gratuites enrichissantes** (appelées côté serveur, mises en cache):
-  - randomuser.me (profils complets avec photos)
-  - DummyJSON (produits, recettes, posts, commentaires)
-  - JSONPlaceholder (posts, todos, albums)
-  - FakerAPI.it (champs variés FR)
-  - Lorem Picsum / ui-avatars (images)
-  - api.quotable.io (citations)
-- **IA**: Lovable AI Gateway (`google/gemini-3-flash-preview` par défaut) pour 2 rôles précis (voir §4).
+## 2. Phase 2 — Enrichissement (APIs gratuites + cache)
 
----
+- `src/lib/engine/enrichers/` : modules `randomuser.ts`, `dummyjson.ts`, `picsum.ts`.
+- Détection: si table s'appelle `users|customers|members` → randomuser; `products|items` → dummyjson products; colonne avatar/image → picsum seed.
+- Cache mémoire process (Map LRU 200 entrées, TTL 1h) — pas de table DB, suffisant pour Workers.
+- Activé seulement si `options.realism === "enriched"`.
 
-## 2. Endpoints API publics
+## 3. Phase 3 — IA (Lovable AI Gateway)
 
-Tous sous `src/routes/api/public/v1/` (auth par clé API via header `X-API-Key`).
+Server function `analyzeSchema` et `validateDataset` dans `src/lib/engine/ai.ts`:
 
-| Méthode | Path | Rôle |
-|---|---|---|
-| POST | `/v1/generate` | Endpoint principal: schéma → données |
-| POST | `/v1/analyze` | Parse un schéma et renvoie le modèle interprété (tables, colonnes, FK détectées) — utile pour debug |
-| GET | `/v1/formats` | Liste formats sortie supportés |
-| GET | `/v1/providers` | Liste APIs gratuites et générateurs disponibles |
-| GET | `/v1/usage` | Quota restant pour la clé |
+- Modèle: `google/gemini-3-flash-preview` (rapide, gratuit pendant la promo).
+- **Analyse** (1 appel): tool-calling structuré → `{ domain, columnHints: { "table.col": "generator_name" } }`.
+- **Validation** (1 appel): échantillon 5 lignes/table → `{ ok, issues[], patches[] }`.
+- Modes: `off | validate | fill-gaps | full` (déjà cadré dans le plan).
+- Échec IA = warning, pas erreur (le moteur algo reste autonome).
 
-### Payload `/v1/generate`
+## 4. Phase 4 — Auth, clés API, quotas
 
-```json
-{
-  "input": {
-    "type": "sql" | "json-schema" | "auto",
-    "files": [
-      { "name": "users.sql", "content": "CREATE TABLE users (...);" },
-      { "name": "messages.sql", "content": "..." }
-    ]
-  },
-  "output": {
-    "format": "sql" | "json" | "csv" | "typescript" | "python",
-    "mode": "single" | "per-table",   // un fichier global ou un par table
-    "sql_dialect": "postgres" | "mysql" | "sqlite"  // si format=sql
-  },
-  "options": {
-    "rows_per_table": { "default": 10, "users": 50, "messages": 200 },
-    "locale": "fr_FR",
-    "seed": 42,                       // reproductible
-    "ai_enrichment": "off" | "validate" | "fill-gaps" | "full",
-    "realism": "basic" | "enriched"   // enriched = appels APIs externes
-  }
-}
-```
+Tables déjà créées (`profiles`, `api_keys`, `usage_logs`, `user_roles`). À ajouter:
 
-### Réponse
+- Migration: table `quotas(plan PK, monthly_rows, monthly_ai_calls, rate_limit_per_min)` + seed 3 plans (free/pro/enterprise).
+- Server functions (`src/lib/keys.functions.ts`):
+  - `createApiKey({ name })` → renvoie clé brute UNE seule fois (`ds_live_<32 hex>`), stocke `sha256(key)` + prefix 8 chars.
+  - `listApiKeys()`, `revokeApiKey(id)`.
+  - `getUsageSummary()` — agrège `usage_logs` du mois.
+- Middleware clé API dans `src/routes/api/public/v1/generate.ts`:
+  - Lit `X-API-Key`, hash, lookup en DB (admin client).
+  - Vérifie quota mensuel (somme `rows_generated` du mois).
+  - Logge la requête (status, durée, lignes, IA).
+  - 401 si manquante, 402 si quota dépassé, 429 si rate-limit (in-memory token bucket par clé).
+- Public endpoint reste callable sans clé seulement depuis l'origine (playground) — détection via header `Origin` matchant le domaine, sinon clé requise.
 
-- `mode=single` → un fichier (string) + métadonnées
-- `mode=per-table` → archive (zip base64) ou objet `{ tableName: content }`
-- Toujours: rapport de génération (lignes par table, providers utilisés, warnings IA, durée, crédits consommés)
+## 5. Pages console (refonte présentation produit)
 
----
+Routes à créer/refondre:
 
-## 3. Pipeline de génération (cœur du moteur)
+- `/` — **Landing pro** (pas le playground) : hero + démo animée schéma→données + 3 features + tarifs + CTA login. Réelle présentation produit, design soigné, semantic tokens, animations subtiles.
+- `/playground` — l'éditeur actuel (déplacé depuis `/`), amélioré avec:
+  - Loading skeleton sur le panneau Résultat (pas un texte "Génération…").
+  - Onglets Schéma / Options / cURL.
+  - Bouton "Télécharger" (.sql, .json, .csv, .ts, .py).
+  - Bouton "Copier".
+  - Sélecteur dialecte SQL, locale, mode IA.
+- `/docs` — documentation statique des endpoints (`/v1/generate`, `/v1/analyze`, `/v1/formats`, `/v1/usage`), exemples curl + JS + Python, table des codes erreurs.
+- `/login`, `/signup` — auth Lovable Cloud (email/password + Google).
+- `/_authenticated.tsx` — guard.
+- `/_authenticated/dashboard` — usage du mois (lignes générées, appels IA, top endpoints) avec petits graphes (chart shadcn).
+- `/_authenticated/keys` — créer / révoquer clés. Modale "copy once".
+- `/_authenticated/history` — 50 derniers logs.
 
-```text
-[1] Parse multi-fichiers
-     └─ SQL → node-sql-parser → AST → modèle unifié
-     └─ JSON Schema → ajv → modèle unifié
-[2] Construction graphe de dépendances (FK)
-     └─ Tri topologique (parents avant enfants)
-     └─ Détection cycles → cassage avec FK nullable d'abord
-[3] Mapping colonnes → générateurs
-     └─ Heuristique nom + type:
-        email→faker.email, avatar→picsum, name→faker.name,
-        phone→faker.phone, address→faker.address,
-        created_at→faker.date.past, status→enum check...
-     └─ Si la table matche un dataset connu (users, products, posts,
-        comments, recipes…) → fetch API gratuite + cache
-[4] Génération ligne par ligne
-     └─ Respect contraintes: NOT NULL, UNIQUE, CHECK, length,
-        enum, default
-     └─ FK: tirage aléatoire pondéré dans PK parent déjà générées
-     └─ Tables d'association N-M: produit cartésien échantillonné
-[5] Enrichissement IA (optionnel, selon ai_enrichment)
-     └─ Voir §4
-[6] Sérialisation
-     └─ Format → writer dédié (sql/json/csv/ts/py)
-     └─ Échappement strict (anti-injection dans les INSERT)
-[7] Packaging (single ou per-table) + rapport
-```
+## 6. UX loading propre
 
----
+- Skeleton shadcn sur les cartes pendant la génération.
+- Progress text : "Parsing schema…" → "Generating rows…" → "Serializing…" (basé sur le timing, pas du fake).
+- Toast d'erreur avec sonner.
+- Spinner sur les boutons (icône lucide `Loader2` qui spin).
 
-## 4. Rôles précis de l'IA (Lovable AI Gateway)
+## 7. Détails techniques
 
-Pour économiser les crédits, l'IA n'est appelée que ciblé:
+- `src/routes/api/public/v1/analyze.ts`, `formats.ts`, `usage.ts` — petits endpoints listant le moteur.
+- `src/lib/engine/parser-sql.ts` — réécrit `colName`, ajoute extraction `dataType` robuste + tests inline (commentaires) avec le schéma users/messages.
+- `src/lib/engine/index.ts` — expose `analyzeOnly(schema)` pour l'endpoint /analyze et le mode IA.
+- Le bug d'hydration cURL (préviewt SSR vs client window.location) → remplacé par un placeholder statique `https://your-domain` côté SSR + remplacement client-side dans un `useEffect`.
+- Tous les composants utilisent les semantic tokens (`bg-background`, `text-foreground`, `bg-primary`, `text-primary-foreground`, `bg-muted`).
+- Animations: `motion` (déjà dispo via framer si pas installé sinon CSS pur).
 
-1. **Analyse contextuelle du schéma** (1 appel par requête, court): l'IA reçoit la liste des tables/colonnes et suggère le **domaine métier** (chat app, e-commerce, blog…) + un mapping enrichi colonne→générateur quand l'heuristique est ambiguë (ex: `bio`, `description`, `slug`, `tagline`). Sortie en tool-calling structuré.
-2. **Validateur final** (1 appel): échantillon des données générées + intent → l'IA renvoie `{ ok: bool, issues: [...], patches: [...] }`. Si `issues`, le moteur applique les patches (regénère certaines colonnes / lignes) selon le mode:
-   - `off`: pas d'IA
-   - `validate`: IA juge mais ne corrige pas (juste warnings dans le rapport)
-   - `fill-gaps`: IA ne remplit que ce que l'algo n'a pas su générer
-   - `full`: les deux ci-dessus + correction proactive
+## 8. Découpage des commits (un seul tour, dans cet ordre)
 
-L'IA ne génère **jamais** les milliers de lignes elle-même.
+1. Fix parser SQL + endpoint /analyze.
+2. Migration quotas + server functions clés/usage.
+3. Middleware clé API + guards quota dans /v1/generate + endpoints /formats /usage.
+4. Auth pages (login/signup) + layout `_authenticated`.
+5. Pages dashboard / keys / history.
+6. Refonte landing + extraction playground vers /playground + loading propre.
+7. Page /docs.
+8. Phase 2 enrichers + Phase 3 IA (à la fin pour ne pas bloquer le reste si IA flaky).
+
+## Out of scope (volontairement)
+
+- Webhooks de génération asynchrone (>10k lignes).
+- Templates communautaires.
+- Export ORM-ready Prisma/Drizzle.
+- Mode incremental.
+- CLI npm.
+
+À garder pour une phase ultérieure si tu valides la base.
 
 ---
 
-## 5. Console web (consomme l'API)
-
-Routes TanStack:
-
-- `/` — landing avec pitch, exemple animé schéma → données
-- `/playground` — éditeur SQL/JSON, choix format, bouton "Generate" qui appelle `/v1/generate`, preview + download
-- `/docs` — documentation interactive des endpoints (façon Scalar/Stoplight, statique)
-- `/login`, `/signup` — auth Lovable Cloud (email/password + Google)
-- `/_authenticated/dashboard` — vue d'ensemble usage
-- `/_authenticated/keys` — gérer ses clés API (créer, révoquer, scopes)
-- `/_authenticated/history` — historique des requêtes (anonymisé)
-- `/_authenticated/billing` — quotas et plans
-
----
-
-## 6. Auth, clés API, quotas
-
-Tables Lovable Cloud:
-- `profiles(id, email, plan, created_at)`
-- `user_roles(user_id, role)` — pattern recommandé (admin/user)
-- `api_keys(id, user_id, key_hash, name, scopes, last_used_at, revoked_at)`
-- `usage_logs(id, api_key_id, endpoint, rows_generated, ai_calls, status, duration_ms, created_at)`
-- `quotas(plan, monthly_rows, monthly_ai_calls, rate_limit_per_min)`
-
-Plans: **Free** (10k lignes/mois, 100 appels IA), **Pro** (1M lignes, 5k IA), **Enterprise** (custom).
-
-Rate-limit: in-memory token bucket par clé + persistance d'un compteur en DB. Surface erreurs 429 + 402 proprement.
-
-Sécurité:
-- SQL reçu **jamais exécuté** — uniquement parsé en AST.
-- Validation taille fichiers (max 1 MB par fichier, 10 fichiers).
-- Validation `rows_per_table` plafonné selon plan.
-- Échappement strict dans les writers SQL.
-- HTTPS, CORS configuré, signatures de webhooks si on en ajoute.
-- Clés API stockées hashées (SHA-256), affichées **une seule fois** à la création.
-
----
-
-## 7. Suggestions à valider en plus du brief
-
-1. **Mode "incremental"**: l'utilisateur peut renvoyer des données existantes pour générer uniquement de nouvelles lignes liées (ex: 100 messages de plus pour les users existants).
-2. **Webhooks**: pour les gros volumes (>10k lignes), génération asynchrone + callback.
-3. **Templates communautaires**: bibliothèque de schémas types (saas, e-commerce, chat, blog) en un clic.
-4. **Export "ORM-ready"**: seed.ts pour Prisma/Drizzle, fixtures Django/Rails.
-5. **Preserve mode**: `seed` fixe + même schéma = mêmes données → reproductible pour CI/CD.
-6. **Compagnon CLI** (phase 2): `npx dataseed gen ./schema.sql -o seed.sql`.
-7. **Détection PII**: refus ou anonymisation si l'IA détecte des champs ressemblant à des données réelles dans le schéma.
-
----
-
-## 8. Découpage de livraison (phases)
-
-**Phase 1 — MVP API**
-- Auth + clés API + dashboard minimal
-- Parsing SQL (Postgres) + JSON Schema
-- Moteur algo (Faker + heuristiques + FK)
-- Formats: SQL, JSON
-- Playground basique
-
-**Phase 2 — Enrichissement**
-- Intégration APIs gratuites (randomuser, dummyjson, picsum, quotable)
-- Cache des réponses externes
-- Formats CSV, TypeScript, Python
-- Mode per-table + zip
-
-**Phase 3 — IA**
-- Analyse contextuelle (1 appel, tool-calling)
-- Validateur + auto-patch
-- Modes `validate` / `fill-gaps` / `full`
-
-**Phase 4 — Pro**
-- Quotas avancés, billing, plans
-- Historique détaillé
-- Templates, génération asynchrone, webhooks
-
----
-
-## Détails techniques clés
-
-- Server routes publics: `src/routes/api/public/v1/*.ts` (bypass auth Lovable, on gère nous-mêmes via `X-API-Key`).
-- Server functions internes pour la console (avec `requireSupabaseAuth`).
-- Parsing/génération côté serveur uniquement (Worker compatible — `node-sql-parser` et `@faker-js/faker` sont pure-JS).
-- IA via fetch direct vers `https://ai.gateway.lovable.dev/v1/chat/completions` avec `process.env.LOVABLE_API_KEY` (pas de stream pour ces appels courts).
-- Cache APIs externes: table `external_cache(provider, query_hash, payload, fetched_at)` — TTL 7 jours.
-- Tests: jeu de schémas réels (chat, e-commerce, blog) en fixtures + assertions sur intégrité FK.
-
-Dis-moi si tu veux ajuster les phases, supprimer/ajouter des suggestions, ou démarrer directement la Phase 1.
+Si le plan te va, je l'implémente d'un coup dans l'ordre ci-dessus.
