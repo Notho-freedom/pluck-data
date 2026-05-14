@@ -54,6 +54,7 @@ export interface GenerateOptions {
   locale?: string;
   seed?: number;
   realism?: "basic" | "enriched";
+  ai_enrichment?: "off" | "validate" | "fill-gaps" | "full";
 }
 
 export interface GenerateRequest {

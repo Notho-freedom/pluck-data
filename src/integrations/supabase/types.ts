@@ -68,6 +68,30 @@ export type Database = {
         }
         Relationships: []
       }
+      quotas: {
+        Row: {
+          created_at: string
+          monthly_ai_calls: number
+          monthly_rows: number
+          plan: string
+          rate_limit_per_min: number
+        }
+        Insert: {
+          created_at?: string
+          monthly_ai_calls?: number
+          monthly_rows?: number
+          plan: string
+          rate_limit_per_min?: number
+        }
+        Update: {
+          created_at?: string
+          monthly_ai_calls?: number
+          monthly_rows?: number
+          plan?: string
+          rate_limit_per_min?: number
+        }
+        Relationships: []
+      }
       usage_logs: {
         Row: {
           ai_calls: number

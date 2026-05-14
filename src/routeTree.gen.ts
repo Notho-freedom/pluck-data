@@ -9,12 +9,67 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PlaygroundRouteImport } from './routes/playground'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DocsRouteImport } from './routes/docs'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedKeysRouteImport } from './routes/_authenticated/keys'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as ApiPublicV1UsageRouteImport } from './routes/api/public/v1/usage'
 import { Route as ApiPublicV1GenerateRouteImport } from './routes/api/public/v1/generate'
+import { Route as ApiPublicV1FormatsRouteImport } from './routes/api/public/v1/formats'
+import { Route as ApiPublicV1AnalyzeRouteImport } from './routes/api/public/v1/analyze'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundRoute = PlaygroundRouteImport.update({
+  id: '/playground',
+  path: '/playground',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedKeysRoute = AuthenticatedKeysRouteImport.update({
+  id: '/keys',
+  path: '/keys',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const ApiPublicV1UsageRoute = ApiPublicV1UsageRouteImport.update({
+  id: '/api/public/v1/usage',
+  path: '/api/public/v1/usage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicV1GenerateRoute = ApiPublicV1GenerateRouteImport.update({
@@ -22,40 +77,190 @@ const ApiPublicV1GenerateRoute = ApiPublicV1GenerateRouteImport.update({
   path: '/api/public/v1/generate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1FormatsRoute = ApiPublicV1FormatsRouteImport.update({
+  id: '/api/public/v1/formats',
+  path: '/api/public/v1/formats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1AnalyzeRoute = ApiPublicV1AnalyzeRouteImport.update({
+  id: '/api/public/v1/analyze',
+  path: '/api/public/v1/analyze',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/docs': typeof DocsRoute
+  '/login': typeof LoginRoute
+  '/playground': typeof PlaygroundRoute
+  '/signup': typeof SignupRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/keys': typeof AuthenticatedKeysRoute
+  '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
+  '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
   '/api/public/v1/generate': typeof ApiPublicV1GenerateRoute
+  '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/docs': typeof DocsRoute
+  '/login': typeof LoginRoute
+  '/playground': typeof PlaygroundRoute
+  '/signup': typeof SignupRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/keys': typeof AuthenticatedKeysRoute
+  '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
+  '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
   '/api/public/v1/generate': typeof ApiPublicV1GenerateRoute
+  '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/docs': typeof DocsRoute
+  '/login': typeof LoginRoute
+  '/playground': typeof PlaygroundRoute
+  '/signup': typeof SignupRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/keys': typeof AuthenticatedKeysRoute
+  '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
+  '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
   '/api/public/v1/generate': typeof ApiPublicV1GenerateRoute
+  '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/v1/generate'
+  fullPaths:
+    | '/'
+    | '/docs'
+    | '/login'
+    | '/playground'
+    | '/signup'
+    | '/dashboard'
+    | '/history'
+    | '/keys'
+    | '/api/public/v1/analyze'
+    | '/api/public/v1/formats'
+    | '/api/public/v1/generate'
+    | '/api/public/v1/usage'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/v1/generate'
-  id: '__root__' | '/' | '/api/public/v1/generate'
+  to:
+    | '/'
+    | '/docs'
+    | '/login'
+    | '/playground'
+    | '/signup'
+    | '/dashboard'
+    | '/history'
+    | '/keys'
+    | '/api/public/v1/analyze'
+    | '/api/public/v1/formats'
+    | '/api/public/v1/generate'
+    | '/api/public/v1/usage'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/docs'
+    | '/login'
+    | '/playground'
+    | '/signup'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/history'
+    | '/_authenticated/keys'
+    | '/api/public/v1/analyze'
+    | '/api/public/v1/formats'
+    | '/api/public/v1/generate'
+    | '/api/public/v1/usage'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  DocsRoute: typeof DocsRoute
+  LoginRoute: typeof LoginRoute
+  PlaygroundRoute: typeof PlaygroundRoute
+  SignupRoute: typeof SignupRoute
+  ApiPublicV1AnalyzeRoute: typeof ApiPublicV1AnalyzeRoute
+  ApiPublicV1FormatsRoute: typeof ApiPublicV1FormatsRoute
   ApiPublicV1GenerateRoute: typeof ApiPublicV1GenerateRoute
+  ApiPublicV1UsageRoute: typeof ApiPublicV1UsageRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground': {
+      id: '/playground'
+      path: '/playground'
+      fullPath: '/playground'
+      preLoaderRoute: typeof PlaygroundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/keys': {
+      id: '/_authenticated/keys'
+      path: '/keys'
+      fullPath: '/keys'
+      preLoaderRoute: typeof AuthenticatedKeysRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/public/v1/usage': {
+      id: '/api/public/v1/usage'
+      path: '/api/public/v1/usage'
+      fullPath: '/api/public/v1/usage'
+      preLoaderRoute: typeof ApiPublicV1UsageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/v1/generate': {
@@ -65,12 +270,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1GenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/formats': {
+      id: '/api/public/v1/formats'
+      path: '/api/public/v1/formats'
+      fullPath: '/api/public/v1/formats'
+      preLoaderRoute: typeof ApiPublicV1FormatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/analyze': {
+      id: '/api/public/v1/analyze'
+      path: '/api/public/v1/analyze'
+      fullPath: '/api/public/v1/analyze'
+      preLoaderRoute: typeof ApiPublicV1AnalyzeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedKeysRoute: typeof AuthenticatedKeysRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedKeysRoute: AuthenticatedKeysRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  DocsRoute: DocsRoute,
+  LoginRoute: LoginRoute,
+  PlaygroundRoute: PlaygroundRoute,
+  SignupRoute: SignupRoute,
+  ApiPublicV1AnalyzeRoute: ApiPublicV1AnalyzeRoute,
+  ApiPublicV1FormatsRoute: ApiPublicV1FormatsRoute,
   ApiPublicV1GenerateRoute: ApiPublicV1GenerateRoute,
+  ApiPublicV1UsageRoute: ApiPublicV1UsageRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

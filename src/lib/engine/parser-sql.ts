@@ -5,6 +5,36 @@ import type { Column, ColumnKind, Table, UnifiedSchema } from "./types";
 
 const parser = new Parser();
 
+/** Robustly extract a column / identifier name from any node-sql-parser node shape. */
+function colName(c: unknown): string {
+  if (c == null) return "";
+  if (typeof c === "string") return c;
+  if (typeof c !== "object") return String(c);
+  const o = c as Record<string, unknown>;
+  // Common shapes across node-sql-parser versions:
+  // { type: "column_ref", column: "id" }
+  // { type: "column_ref", column: { expr: { type: "default", value: "id" } } }
+  // { expr: { value: "id" } }
+  // { value: "id" }
+  if (typeof o.column === "string") return o.column;
+  if (o.column && typeof o.column === "object") return colName(o.column);
+  if (o.expr && typeof o.expr === "object") return colName(o.expr);
+  if (typeof o.value === "string") return o.value;
+  if (typeof o.name === "string") return o.name;
+  return "";
+}
+
+function dataTypeString(def: any): string {
+  const dt = def?.dataType;
+  if (typeof dt === "string") return dt;
+  if (dt && typeof dt === "object") {
+    if (typeof dt.dataType === "string") return dt.dataType;
+    if (typeof dt.type === "string") return dt.type;
+    if (typeof dt.value === "string") return dt.value;
+  }
+  return "unknown";
+}
+
 function mapType(rawType: string): ColumnKind {
   const t = rawType.toLowerCase();
   if (t.includes("uuid")) return "uuid";
@@ -35,11 +65,18 @@ function tryParse(sql: string, dialect: string): unknown {
   }
 }
 
+function tableNameOf(stmt: any): string {
+  const t = stmt?.table;
+  if (!t) return "";
+  if (Array.isArray(t)) return t[0]?.table ?? "";
+  if (typeof t === "object") return t.table ?? "";
+  return String(t);
+}
+
 export function parseSqlDdl(
   files: Array<{ name: string; content: string }>,
 ): UnifiedSchema {
   const all = files.map((f) => f.content).join("\n;\n");
-  // Try several dialects until one parses
   const dialects = ["PostgresQL", "MySQL", "SQLite", "MariaDB"];
   let ast: any = null;
   let usedDialect: "postgres" | "mysql" | "sqlite" = "postgres";
@@ -62,7 +99,7 @@ export function parseSqlDdl(
 
   for (const stmt of stmts) {
     if (!stmt || stmt.type !== "create" || stmt.keyword !== "table") continue;
-    const tableName = stmt.table?.[0]?.table ?? stmt.table;
+    const tableName = tableNameOf(stmt);
     if (!tableName) continue;
 
     const columns: Column[] = [];
@@ -70,13 +107,11 @@ export function parseSqlDdl(
     const uniqueCols = new Set<string>();
     const fks: Record<string, { table: string; column: string }> = {};
 
-    const colName = (c: any): string =>
-      typeof c === "string" ? c : (c?.column ?? c?.expr?.column ?? String(c));
-
     for (const def of stmt.create_definitions ?? []) {
       if (def.resource === "column") {
         const name = colName(def.column);
-        const rawType = def.definition?.dataType ?? "unknown";
+        if (!name) continue;
+        const rawType = dataTypeString(def.definition);
         const length = def.definition?.length;
         const col: Column = {
           name,
@@ -92,10 +127,11 @@ export function parseSqlDdl(
         };
         if (def.reference_definition) {
           const ref = def.reference_definition;
-          col.fk = {
-            table: ref.table?.[0]?.table ?? ref.table,
-            column: ref.definition?.[0]?.column ?? "id",
-          };
+          const refTable =
+            (Array.isArray(ref.table) ? ref.table[0]?.table : ref.table?.table) ??
+            ref.table;
+          const refCol = colName(ref.definition?.[0]) || "id";
+          col.fk = { table: String(refTable), column: refCol };
         }
         columns.push(col);
       } else if (def.resource === "constraint") {
@@ -107,10 +143,12 @@ export function parseSqlDdl(
         } else if (t === "FOREIGN KEY" || t === "foreign key") {
           const localCols = (def.definition ?? []).map((c: any) => colName(c));
           const ref = def.reference_definition;
-          const refTable = ref?.table?.[0]?.table ?? ref?.table;
+          const refTable =
+            (Array.isArray(ref?.table) ? ref.table[0]?.table : ref?.table?.table) ??
+            ref?.table;
           const refCols = (ref?.definition ?? []).map((c: any) => colName(c));
           localCols.forEach((c: string, i: number) => {
-            fks[c] = { table: refTable, column: refCols[i] ?? "id" };
+            if (c) fks[c] = { table: String(refTable), column: refCols[i] || "id" };
           });
         }
       }
