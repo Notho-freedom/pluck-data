@@ -10,11 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicV1UsageRouteImport } from './routes/api/public/v1/usage'
 import { Route as ApiPublicV1GenerateRouteImport } from './routes/api/public/v1/generate'
+import { Route as ApiPublicV1FormatsRouteImport } from './routes/api/public/v1/formats'
+import { Route as ApiPublicV1AnalyzeRouteImport } from './routes/api/public/v1/analyze'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1UsageRoute = ApiPublicV1UsageRouteImport.update({
+  id: '/api/public/v1/usage',
+  path: '/api/public/v1/usage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicV1GenerateRoute = ApiPublicV1GenerateRouteImport.update({
@@ -22,31 +30,69 @@ const ApiPublicV1GenerateRoute = ApiPublicV1GenerateRouteImport.update({
   path: '/api/public/v1/generate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1FormatsRoute = ApiPublicV1FormatsRouteImport.update({
+  id: '/api/public/v1/formats',
+  path: '/api/public/v1/formats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1AnalyzeRoute = ApiPublicV1AnalyzeRouteImport.update({
+  id: '/api/public/v1/analyze',
+  path: '/api/public/v1/analyze',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
+  '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
   '/api/public/v1/generate': typeof ApiPublicV1GenerateRoute
+  '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
+  '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
   '/api/public/v1/generate': typeof ApiPublicV1GenerateRoute
+  '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
+  '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
   '/api/public/v1/generate': typeof ApiPublicV1GenerateRoute
+  '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/v1/generate'
+  fullPaths:
+    | '/'
+    | '/api/public/v1/analyze'
+    | '/api/public/v1/formats'
+    | '/api/public/v1/generate'
+    | '/api/public/v1/usage'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/v1/generate'
-  id: '__root__' | '/' | '/api/public/v1/generate'
+  to:
+    | '/'
+    | '/api/public/v1/analyze'
+    | '/api/public/v1/formats'
+    | '/api/public/v1/generate'
+    | '/api/public/v1/usage'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/public/v1/analyze'
+    | '/api/public/v1/formats'
+    | '/api/public/v1/generate'
+    | '/api/public/v1/usage'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicV1AnalyzeRoute: typeof ApiPublicV1AnalyzeRoute
+  ApiPublicV1FormatsRoute: typeof ApiPublicV1FormatsRoute
   ApiPublicV1GenerateRoute: typeof ApiPublicV1GenerateRoute
+  ApiPublicV1UsageRoute: typeof ApiPublicV1UsageRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +104,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/usage': {
+      id: '/api/public/v1/usage'
+      path: '/api/public/v1/usage'
+      fullPath: '/api/public/v1/usage'
+      preLoaderRoute: typeof ApiPublicV1UsageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/v1/generate': {
       id: '/api/public/v1/generate'
       path: '/api/public/v1/generate'
@@ -65,13 +118,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1GenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/formats': {
+      id: '/api/public/v1/formats'
+      path: '/api/public/v1/formats'
+      fullPath: '/api/public/v1/formats'
+      preLoaderRoute: typeof ApiPublicV1FormatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/analyze': {
+      id: '/api/public/v1/analyze'
+      path: '/api/public/v1/analyze'
+      fullPath: '/api/public/v1/analyze'
+      preLoaderRoute: typeof ApiPublicV1AnalyzeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicV1AnalyzeRoute: ApiPublicV1AnalyzeRoute,
+  ApiPublicV1FormatsRoute: ApiPublicV1FormatsRoute,
   ApiPublicV1GenerateRoute: ApiPublicV1GenerateRoute,
+  ApiPublicV1UsageRoute: ApiPublicV1UsageRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
