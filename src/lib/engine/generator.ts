@@ -90,6 +90,26 @@ function pickByType(faker: Faker, col: Column): unknown {
   }
 }
 
+function pickByHint(faker: Faker, hint: string): unknown {
+  switch (hint) {
+    case "name": return faker.person.fullName();
+    case "email": return faker.internet.email();
+    case "bio": return faker.person.bio();
+    case "title": return faker.lorem.sentence({ min: 3, max: 8 });
+    case "company": return faker.company.name();
+    case "product": return faker.commerce.productName();
+    case "address": return faker.location.streetAddress();
+    case "phone": return faker.phone.number();
+    case "url": return faker.internet.url();
+    case "sentence": return faker.lorem.sentence();
+    case "paragraph": return faker.lorem.paragraph();
+    case "uuid": return faker.string.uuid();
+    case "date": return faker.date.past({ years: 1 });
+    case "price": return Number(faker.commerce.price({ min: 1, max: 9999 }));
+    default: return undefined;
+  }
+}
+
 function valueFor(
   faker: Faker,
   col: Column,
@@ -102,6 +122,11 @@ function valueFor(
   }
   if (col.enumValues && col.enumValues.length > 0) {
     return faker.helpers.arrayElement(col.enumValues);
+  }
+  const aiHint = (col as any).aiHint as string | undefined;
+  if (aiHint) {
+    const v = pickByHint(faker, aiHint);
+    if (v !== undefined) return v;
   }
   const byName = pickByName(faker, col);
   if (byName !== undefined) return byName;
