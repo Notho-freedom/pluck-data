@@ -81,10 +81,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Turn a SQL or JSON schema into realistic seed data. Foreign keys preserved. Output as SQL, JSON, CSV, TypeScript, or Python.",
       },
       { name: "author", content: "DataSeed" },
-      { property: "og:title", content: "DataSeed — Realistic seed data from your schema" },
-      { property: "og:description", content: "Schema in, demo data out. SQL, JSON, CSV, TS, Python." },
+      { property: "og:title", content: "DataSeed — API to generate realistic demo data from any schema" },
+      { property: "og:description", content: "API that generates demo data from SQL or JSON schemas." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "DataSeed — API to generate realistic demo data from any schema" },
+      { name: "description", content: "API that generates demo data from SQL or JSON schemas." },
+      { name: "twitter:description", content: "API that generates demo data from SQL or JSON schemas." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/dc8b4f31-c0a8-4350-9556-7bd5df7278d9/id-preview-8e069ebc--159a6e92-1b29-48e7-93e6-c73244d3a0d3.lovable.app-1780301995522.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/dc8b4f31-c0a8-4350-9556-7bd5df7278d9/id-preview-8e069ebc--159a6e92-1b29-48e7-93e6-c73244d3a0d3.lovable.app-1780301995522.png" },
     ],
     links: [
       {
