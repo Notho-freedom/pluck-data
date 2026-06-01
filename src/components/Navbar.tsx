@@ -40,13 +40,29 @@ export function Navbar({ variant = "marketing" }: NavbarProps) {
             Docs
           </Link>
           {user && (
-            <Link
-              to="/dashboard"
-              className="rounded-md px-3 py-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
-              activeProps={{ className: "rounded-md px-3 py-1.5 text-foreground bg-accent" }}
-            >
-              Dashboard
-            </Link>
+            <>
+              <Link
+                to="/dashboard"
+                className="rounded-md px-3 py-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                activeProps={{ className: "rounded-md px-3 py-1.5 text-foreground bg-accent" }}
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/keys"
+                className="rounded-md px-3 py-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                activeProps={{ className: "rounded-md px-3 py-1.5 text-foreground bg-accent" }}
+              >
+                Keys
+              </Link>
+              <Link
+                to="/history"
+                className="rounded-md px-3 py-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                activeProps={{ className: "rounded-md px-3 py-1.5 text-foreground bg-accent" }}
+              >
+                History
+              </Link>
+            </>
           )}
         </nav>
 
