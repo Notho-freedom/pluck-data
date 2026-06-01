@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight, Check, Shuffle, Code2, Sparkles, Zap, Lock, Globe2,
-  Terminal, Database, FileJson, FileCode, Layers, GitBranch,
+  Terminal, Database, FileJson, FileCode, GitBranch,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
