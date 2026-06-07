@@ -5,6 +5,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
+import { Typewriter } from "@/components/animations/Typewriter";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
+import { CountUp } from "@/components/animations/CountUp";
+import { Magnetic } from "@/components/animations/Magnetic";
+import { AuroraBackground } from "@/components/animations/AuroraBackground";
+import { AnimatedTerminal } from "@/components/animations/AnimatedTerminal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
