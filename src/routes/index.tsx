@@ -293,24 +293,31 @@ console.log(\`✓ \${report.totalRows} rows in \${report.durationMs}ms\`);`}
 
       {/* ───────── Final CTA ───────── */}
       <section className="relative overflow-hidden border-t border-border/60">
-        <div className="bg-aurora pointer-events-none absolute inset-0 -z-10" />
+        <AuroraBackground />
         <div className="mx-auto max-w-3xl px-6 py-24 text-center">
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl">
-            <span className="text-gradient">Stop hand-writing fixtures.</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-            Sign up in 30 seconds, paste a schema, get a key, ship better demos.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg" className="shadow-glow">
-              <Link to="/signup">Create your free account <ArrowRight className="ml-1 h-4 w-4" /></Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link to="/playground">Try without signup</Link>
-            </Button>
-          </div>
+          <ScrollReveal>
+            <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+              <span className="text-gradient">Stop hand-writing fixtures.</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+              Sign up in 30 seconds, paste a schema, get a key, ship better demos.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Magnetic>
+                <Button asChild size="lg" className="shadow-glow animate-glow-pulse">
+                  <Link to="/signup">Create your free account <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                </Button>
+              </Magnetic>
+              <Magnetic>
+                <Button asChild size="lg" variant="outline">
+                  <Link to="/playground">Try without signup</Link>
+                </Button>
+              </Magnetic>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
+
 
       <footer className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground">
