@@ -71,13 +71,18 @@ export const getUsageSummary = createServerFn({ method: "GET" })
     monthStart.setUTCDate(1);
     monthStart.setUTCHours(0, 0, 0, 0);
 
-    const [{ data: profile }, { data: logs }] = await Promise.all([
+    const [{ data: profile }, { data: logs }, { count: keyCount }] = await Promise.all([
       supabaseAdmin.from("profiles").select("plan").eq("id", context.userId).maybeSingle(),
       supabaseAdmin
         .from("usage_logs")
         .select("rows_generated, ai_calls, status, duration_ms, endpoint, created_at")
         .eq("user_id", context.userId)
         .gte("created_at", monthStart.toISOString()),
+      supabaseAdmin
+        .from("api_keys")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", context.userId)
+        .is("revoked_at", null),
     ]);
 
     const plan = profile?.plan ?? "free";
@@ -101,6 +106,8 @@ export const getUsageSummary = createServerFn({ method: "GET" })
       monthlyRows: Number(quota?.monthly_rows ?? 0),
       monthlyAiCalls: Number(quota?.monthly_ai_calls ?? 0),
       rateLimitPerMin: Number(quota?.rate_limit_per_min ?? 30),
+      hasKey: (keyCount ?? 0) > 0,
+      hasCall: totalCalls > 0,
     };
   });
 

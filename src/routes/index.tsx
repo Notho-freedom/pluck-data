@@ -5,6 +5,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
+import { Typewriter } from "@/components/animations/Typewriter";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
+import { CountUp } from "@/components/animations/CountUp";
+import { Magnetic } from "@/components/animations/Magnetic";
+import { AuroraBackground } from "@/components/animations/AuroraBackground";
+import { AnimatedTerminal } from "@/components/animations/AnimatedTerminal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -48,13 +54,13 @@ function Landing() {
       {/* ───────── Hero ───────── */}
       <section className="relative overflow-hidden">
         <div className="bg-grid pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(60%_50%_at_50%_30%,black,transparent)]" />
-        <div className="bg-aurora pointer-events-none absolute inset-0 -z-10" />
+        <AuroraBackground />
 
         <div className="mx-auto max-w-7xl px-6 pt-24 pb-20">
           <div className="mx-auto max-w-3xl text-center">
             <a
               href="#docs"
-              className="group inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur transition-colors hover:border-primary/40 hover:text-foreground"
+              className="group inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur transition-colors hover:border-primary/40 hover:text-foreground animate-fade-in"
             >
               <span className="relative grid h-1.5 w-1.5 place-items-center">
                 <span className="absolute inset-0 animate-pulse-dot rounded-full bg-primary" />
@@ -67,25 +73,33 @@ function Landing() {
             <h1 className="mt-6 text-balance text-5xl font-bold tracking-tight sm:text-7xl">
               <span className="text-gradient">Schema in.</span>
               <br />
-              <span className="text-mint-gradient">Realistic data out.</span>
+              <span className="text-mint-gradient bg-[length:200%_auto] animate-gradient">
+                <Typewriter
+                  words={["Realistic data out.", "SQL inserts out.", "JSON fixtures out.", "CSV rows out.", "TypeScript seeds out."]}
+                />
+              </span>
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+            <p className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg animate-fade-in">
               The API that turns any <code className="rounded bg-muted/70 px-1.5 py-0.5 font-mono text-[0.85em]">CREATE TABLE</code> or JSON Schema into coherent demo rows.
               Foreign keys preserved. Locale-aware. Ready to seed your dev database.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" className="shadow-glow">
-                <Link to="/playground">
-                  Open the playground
-                  <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link to="/docs">
-                  <Terminal className="mr-1 h-4 w-4" /> Read the API
-                </Link>
-              </Button>
+              <Magnetic>
+                <Button asChild size="lg" className="shadow-glow animate-glow-pulse">
+                  <Link to="/playground">
+                    Open the playground
+                    <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+              </Magnetic>
+              <Magnetic>
+                <Button asChild variant="outline" size="lg">
+                  <Link to="/docs">
+                    <Terminal className="mr-1 h-4 w-4" /> Read the API
+                  </Link>
+                </Button>
+              </Magnetic>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12px] text-muted-foreground">
@@ -95,33 +109,40 @@ function Landing() {
             </div>
           </div>
 
-          {/* Schema → Data terminal */}
-          <div className="relative mx-auto mt-20 max-w-6xl">
-            <div className="absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-tr from-primary/20 via-transparent to-primary/10 opacity-60 blur-2xl" />
-            <div className="grid gap-3 rounded-2xl border border-border/80 bg-card/60 p-3 shadow-elevated backdrop-blur-sm lg:grid-cols-[1fr_auto_1.15fr] lg:items-stretch">
-              <TerminalPane title="schema.sql" badge="INPUT" lang="sql" code={SAMPLE_IN} />
-              <div className="hidden items-center justify-center lg:flex">
-                <div className="grid h-9 w-9 place-items-center rounded-full border border-primary/30 bg-primary/10 text-primary">
-                  <ArrowRight className="h-4 w-4" />
-                </div>
-              </div>
-              <TerminalPane title="seed.sql" badge="OUTPUT" lang="sql" code={SAMPLE_OUT} accent />
+          {/* Schema → Data animated terminal */}
+          <ScrollReveal delay={120}>
+            <div className="relative mx-auto mt-20 max-w-6xl">
+              <div className="absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-tr from-primary/20 via-transparent to-primary/10 opacity-60 blur-2xl" />
+              <AnimatedTerminal input={SAMPLE_IN} output={SAMPLE_OUT} />
             </div>
-          </div>
+          </ScrollReveal>
+
+          {/* Stats band */}
+          <ScrollReveal delay={200}>
+            <div className="mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-xl border border-border/80 bg-border/60 md:grid-cols-4">
+              <StatBand value={<CountUp to={80} suffix="ms" />} label="median latency" />
+              <StatBand value={<CountUp to={100} suffix="k" />} label="rows / call" />
+              <StatBand value={<CountUp to={10} suffix="+" />} label="locales" />
+              <StatBand value={<CountUp to={5} />} label="output formats" />
+            </div>
+          </ScrollReveal>
 
           {/* Logos / trust */}
-          <div className="mx-auto mt-14 max-w-3xl">
-            <p className="text-center text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground/70">
-              works with every stack you already use
-            </p>
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
-              {["Postgres", "MySQL", "SQLite", "Prisma", "Drizzle", "TypeORM", "Knex"].map((s) => (
-                <span key={s} className="font-mono">{s}</span>
-              ))}
+          <ScrollReveal delay={280}>
+            <div className="mx-auto mt-14 max-w-3xl">
+              <p className="text-center text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground/70">
+                works with every stack you already use
+              </p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
+                {["Postgres", "MySQL", "SQLite", "Prisma", "Drizzle", "TypeORM", "Knex"].map((s) => (
+                  <span key={s} className="font-mono transition-colors hover:text-foreground">{s}</span>
+                ))}
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
+
 
       {/* ───────── Features ───────── */}
       <section className="relative border-y border-border/60 bg-card/30">
@@ -272,24 +293,31 @@ console.log(\`✓ \${report.totalRows} rows in \${report.durationMs}ms\`);`}
 
       {/* ───────── Final CTA ───────── */}
       <section className="relative overflow-hidden border-t border-border/60">
-        <div className="bg-aurora pointer-events-none absolute inset-0 -z-10" />
+        <AuroraBackground />
         <div className="mx-auto max-w-3xl px-6 py-24 text-center">
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl">
-            <span className="text-gradient">Stop hand-writing fixtures.</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-            Sign up in 30 seconds, paste a schema, get a key, ship better demos.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg" className="shadow-glow">
-              <Link to="/signup">Create your free account <ArrowRight className="ml-1 h-4 w-4" /></Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link to="/playground">Try without signup</Link>
-            </Button>
-          </div>
+          <ScrollReveal>
+            <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+              <span className="text-gradient">Stop hand-writing fixtures.</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+              Sign up in 30 seconds, paste a schema, get a key, ship better demos.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Magnetic>
+                <Button asChild size="lg" className="shadow-glow animate-glow-pulse">
+                  <Link to="/signup">Create your free account <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                </Button>
+              </Magnetic>
+              <Magnetic>
+                <Button asChild size="lg" variant="outline">
+                  <Link to="/playground">Try without signup</Link>
+                </Button>
+              </Magnetic>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
+
 
       <footer className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground">
@@ -316,6 +344,15 @@ function Bullet({ children }: { children: React.ReactNode }) {
       <Check className="h-3 w-3 text-primary" />
       {children}
     </span>
+  );
+}
+
+function StatBand({ value, label }: { value: React.ReactNode; label: string }) {
+  return (
+    <div className="bg-card/60 px-5 py-6 text-center transition-colors hover:bg-card">
+      <div className="text-2xl font-bold tracking-tight text-gradient sm:text-3xl">{value}</div>
+      <div className="mt-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">{label}</div>
+    </div>
   );
 }
 

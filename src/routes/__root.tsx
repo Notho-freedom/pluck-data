@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
+import { PageTransition } from "@/components/animations/PageTransition";
 
 import appCss from "../styles.css?url";
 
@@ -127,7 +128,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
         <Toaster richColors position="top-right" />
       </AuthProvider>
     </QueryClientProvider>

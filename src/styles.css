@@ -172,3 +172,60 @@
   color: var(--color-primary);
   animation: type-caret 1s steps(1) infinite;
 }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translate3d(0, 6px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.animate-fade-in { animation: fade-in 0.5s ease-out both; }
+
+@keyframes aurora-drift {
+  0%   { transform: translate3d(-50%, 0, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate3d(-48%, 4%, 0) rotate(20deg) scale(1.08); }
+  100% { transform: translate3d(-50%, 0, 0) rotate(0deg) scale(1); }
+}
+.animate-aurora { animation: aurora-drift 22s ease-in-out infinite; }
+
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -2%, 0); }
+}
+.animate-float { animation: float 14s ease-in-out infinite; }
+.animate-float-slow { animation: float 22s ease-in-out infinite; }
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.84 0.18 155 / 0%), 0 0 20px oklch(0.84 0.18 155 / 25%); }
+  50%      { box-shadow: 0 0 0 4px oklch(0.84 0.18 155 / 12%), 0 0 28px oklch(0.84 0.18 155 / 40%); }
+}
+.animate-glow-pulse { animation: glow-pulse 2.6s ease-in-out infinite; }
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+.animate-scanline { animation: scanline 4s linear infinite; }
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 30s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora, .animate-float, .animate-float-slow,
+  .animate-glow-pulse, .animate-gradient, .animate-scanline,
+  .animate-marquee, .animate-shimmer, .animate-pulse-dot,
+  .animate-fade-in {
+    animation: none !important;
+  }
+  .caret::after { animation: none; opacity: 1; }
+}

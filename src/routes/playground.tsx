@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Loader2, Copy, Download, Sparkles, Play, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -7,11 +7,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Navbar } from "@/components/Navbar";
+import { ProgressSteps } from "@/components/ProgressSteps";
+import { ExampleGallery } from "@/components/onboarding/ExampleGallery";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
+import { CountUp } from "@/components/animations/CountUp";
+import { Magnetic } from "@/components/animations/Magnetic";
+import { EXAMPLES, type SchemaExample } from "@/lib/examples";
 
 export const Route = createFileRoute("/playground")({
+  validateSearch: (s: Record<string, unknown>) => ({ example: typeof s.example === "string" ? s.example : undefined }),
   head: () => ({
     meta: [
       { title: "Playground — DataSeed API" },
@@ -96,6 +102,27 @@ function Playground() {
     URL.revokeObjectURL(url);
   };
 
+  const search = useSearch({ from: "/playground" });
+  const [activeExample, setActiveExample] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (search.example) {
+      const ex = EXAMPLES.find((e) => e.id === search.example);
+      if (ex) pickExample(ex);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.example]);
+
+  function pickExample(ex: SchemaExample) {
+    setSchema(ex.schema);
+    if (ex.suggestedFormat) setFormat(ex.suggestedFormat);
+    if (ex.suggestedLocale) setLocale(ex.suggestedLocale);
+    setActiveExample(ex.id);
+    setOutput("");
+    setReport(null);
+    setError(null);
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar variant="app" />
@@ -108,12 +135,18 @@ function Playground() {
               Paste a schema. Pick a format. Get rows back. Capped at 100 rows/table without an API key.
             </p>
           </div>
-          <Button onClick={generate} disabled={loading} size="lg" className="shadow-glow">
-            {loading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating…</>) : (<><Play className="mr-2 h-4 w-4" /> Generate</>)}
-          </Button>
+          <Magnetic>
+            <Button onClick={generate} disabled={loading} size="lg" className={`shadow-glow ${!loading && output === "" ? "animate-glow-pulse" : ""}`}>
+              {loading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating…</>) : (<><Play className="mr-2 h-4 w-4" /> Generate</>)}
+            </Button>
+          </Magnetic>
         </div>
 
-        <div className="mt-8 grid gap-5 lg:grid-cols-5">
+        <div className="mt-6">
+          <ExampleGallery onPick={pickExample} activeId={activeExample} />
+        </div>
+
+        <div className="mt-6 grid gap-5 lg:grid-cols-5">
           {/* Schema editor */}
           <Panel className="lg:col-span-3" title="schema.sql" badge="INPUT">
             <Textarea
@@ -183,15 +216,15 @@ function Playground() {
                 <p className="mt-2 text-[11px] text-muted-foreground">Requires an API key for production calls.</p>
               </div>
 
-              {error && <p className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">{error}</p>}
+              {error && <p className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive animate-fade-in">{error}</p>}
             </div>
 
             {report && (
-              <div className="rounded-xl border border-border/80 bg-card/60 p-5">
+              <div className="rounded-xl border border-border/80 bg-card/60 p-5 animate-fade-in">
                 <h3 className="text-sm font-semibold">Report</h3>
                 <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
-                  <Metric label="Rows" value={String(report.totalRows)} />
-                  <Metric label="Duration" value={`${report.durationMs}ms`} />
+                  <Metric label="Rows" value={<CountUp to={report.totalRows} />} />
+                  <Metric label="Duration" value={<><CountUp to={report.durationMs} />ms</>} />
                   {report.aiCalls > 0 && <Metric label="AI calls" value={String(report.aiCalls)} />}
                   {report.domain && <Metric label="Domain" value={report.domain} />}
                 </dl>
@@ -221,26 +254,28 @@ function Playground() {
           }
         >
           {loading ? (
-            <div className="space-y-2 p-5">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                <span className="font-mono">parsing schema · generating rows · serializing…</span>
-              </div>
-              {[3, 5, 4, 6, 5, 4, 3, 5].map((w, i) => (
-                <Skeleton key={i} className="h-3.5" style={{ width: `${w * 12 + 20}%` }} />
-              ))}
-            </div>
+            <ProgressSteps
+              steps={[
+                { id: "parse", label: "Parsing schema" },
+                { id: "infer", label: "Inferring column types" },
+                { id: "gen", label: "Generating rows" },
+                { id: "ser", label: "Serializing output" },
+              ]}
+              active
+            />
           ) : output ? (
-            <pre className="max-h-[480px] overflow-auto p-5 font-mono text-[12.5px] leading-relaxed text-foreground/90">
+            <pre className="max-h-[480px] overflow-auto p-5 font-mono text-[12.5px] leading-relaxed text-foreground/90 animate-fade-in">
               <code>{output}</code>
             </pre>
           ) : (
             <div className="grid place-items-center p-12 text-center">
-              <Sparkles className="h-6 w-6 text-muted-foreground/50" />
+              <Sparkles className="h-6 w-6 text-muted-foreground/50 animate-pulse" />
               <p className="mt-3 text-sm text-muted-foreground">Your seed data will appear here.</p>
             </div>
           )}
         </Panel>
+
+
 
         {/* SDK */}
         <div className="mt-12">
@@ -326,7 +361,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-md border border-border/60 bg-background/50 p-2.5">
       <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</dt>
