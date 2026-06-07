@@ -361,7 +361,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-md border border-border/60 bg-background/50 p-2.5">
       <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</dt>
