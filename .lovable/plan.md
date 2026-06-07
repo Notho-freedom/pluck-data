@@ -1,105 +1,91 @@
+# Pourquoi un plan
 
-# Finalisation DataSeed API
+Le résumé de la session précédente prétendait que les composants `Typewriter`, `AnimatedTerminal`, `ScrollReveal`, `CountUp`, `ProgressSteps`, `ExampleGallery`, `OnboardingChecklist` et `examples.ts` avaient été créés. **Aucun de ces fichiers n'existe réellement** dans le projet (`src/components/` ne contient que `Navbar.tsx` et `ui/`). C'est pour ça que tu ne vois aucune animation avancée. On reprend proprement, on livre vraiment, et on met Stripe complètement de côté.
 
-## 1. Bug critique à corriger d'abord (ce que tu vois dans le résultat)
+# Ce qui sera livré dans ce tour
 
-Cause: `node-sql-parser` retourne désormais les noms de colonnes comme `{ expr: { value: 'id' } }`. Le parser actuel fait `String(c)` → `[object Object]`. Ensuite, `mapType` ne reconnaît plus le type (objet aussi) → kind devient `unknown` → générateur retombe sur des lorem mais surtout les colonnes portent toutes le même nom `[object Object]` donc se collisionnent et n'écrivent qu'une seule valeur (la dernière, un timestamp pour `created_at`).
+## 1. Bibliothèque d'animations (vraie, pas du fade-in basique)
 
-Correctif (`src/lib/engine/parser-sql.ts`):
+Nouveau dossier `src/components/animations/`:
 
-- Helper `colName` robuste qui descend `column.expr.value`, `column.value`, `column.column`, ou `String`.
-- Helper `extractDataType` qui gère `definition.dataType` quand c'est un objet imbriqué.
-- Tester avec le schéma users/messages — vérifier que `INSERT INTO "users" ("id", "email", "full_name", "created_at") VALUES ('uuid', 'mail@…', 'Jean Dupont', '2024…')` est correct.
-- Bonus: parser `REFERENCES users(id)` inline (clé étrangère) — déjà géré, vérifier qu'il fonctionne avec la nouvelle extraction.
+- **Typewriter.tsx** — typing char-par-char avec curseur clignotant, support de plusieurs phrases en rotation, vitesse + delay configurables, respecte `prefers-reduced-motion`.
+- **AnimatedTerminal.tsx** — simule un terminal qui tape une commande SQL puis "exécute" et révèle ligne-par-ligne la sortie JSON/SQL générée, avec scanline et caret.
+- **ScrollReveal.tsx** — `IntersectionObserver`, déclenche `opacity + translateY + blur` une seule fois, props `delay`, `direction`, `as`.
+- **CountUp.tsx** — anime un nombre vers sa valeur cible avec easing, déclenché à l'entrée dans la vue, formatte (k/M/ms/%).
+- **Magnetic.tsx** — bouton/élément magnétique (suit légèrement le curseur), utilisé sur les CTAs principaux.
+- **AuroraBackground.tsx** — gradient animé conic-gradient + blob radiaux qui dérivent lentement, pour le hero et la section finale.
+- **GradientText.tsx** — texte avec gradient animé (déplacement du gradient en boucle).
 
-## 2. Phase 2 — Enrichissement (APIs gratuites + cache)
+Mises à jour de `src/styles.css`:
+- Keyframes: `aurora-drift`, `gradient-shift`, `scanline`, `float-slow`, `reveal-up`, `glow-pulse`, `marquee`.
+- Utilitaires: `.animate-aurora`, `.animate-gradient`, `.animate-scanline`, `.animate-float`, `.animate-glow-pulse`, `.animate-marquee`.
+- Media query `@media (prefers-reduced-motion: reduce)` qui désactive tout proprement.
 
-- `src/lib/engine/enrichers/` : modules `randomuser.ts`, `dummyjson.ts`, `picsum.ts`.
-- Détection: si table s'appelle `users|customers|members` → randomuser; `products|items` → dummyjson products; colonne avatar/image → picsum seed.
-- Cache mémoire process (Map LRU 200 entrées, TTL 1h) — pas de table DB, suffisant pour Workers.
-- Activé seulement si `options.realism === "enriched"`.
+## 2. Skeletons et écrans de progression
 
-## 3. Phase 3 — IA (Lovable AI Gateway)
+Nouveau dossier `src/components/skeletons/`:
 
-Server function `analyzeSchema` et `validateDataset` dans `src/lib/engine/ai.ts`:
+- **TableSkeleton.tsx**, **CardSkeleton.tsx**, **MetricSkeleton.tsx** — basés sur `ui/skeleton` mais avec shimmer mint discret.
+- **ProgressSteps.tsx** dans `src/components/` — composant multi-étapes (Parsing → Inferring → Generating → Serializing → Done) avec icônes Lucide, barre de progression linéaire, état actif/done/pending. Utilisé dans le Playground à la place du skeleton générique actuel.
+- Auth (login/signup): boutons avec spinner + état "Signing you in…" / "Creating your account…" plutôt que juste désactivé.
+- Export (copy/download): toast progressif + petit spinner sur le bouton pendant la sérialisation des gros payloads.
 
-- Modèle: `google/gemini-3-flash-preview` (rapide, gratuit pendant la promo).
-- **Analyse** (1 appel): tool-calling structuré → `{ domain, columnHints: { "table.col": "generator_name" } }`.
-- **Validation** (1 appel): échantillon 5 lignes/table → `{ ok, issues[], patches[] }`.
-- Modes: `off | validate | fill-gaps | full` (déjà cadré dans le plan).
-- Échec IA = warning, pas erreur (le moteur algo reste autonome).
+## 3. Onboarding guidé
 
-## 4. Phase 4 — Auth, clés API, quotas
+Nouveau dossier `src/components/onboarding/`:
 
-Tables déjà créées (`profiles`, `api_keys`, `usage_logs`, `user_roles`). À ajouter:
+- **ExampleGallery.tsx** — galerie de 6 exemples cliquables (Chat app, E-commerce, SaaS billing, Blog CMS, CRM, Analytics events), chaque carte pré-remplit le Playground via état + query param `?example=chat`.
+- **OnboardingChecklist.tsx** — checklist sur le Dashboard (3 étapes: créer une clé, faire un premier appel, exporter un format), basée sur `hasKey`/`hasCall` que renvoie déjà `getUsageSummary` (à étendre).
+- **HowItWorks.tsx** — section landing "3 étapes animées" avec connexion entre les étapes (ligne qui se dessine au scroll).
+- **TryItIn10s.tsx** — bloc sticky landing avec snippet cURL + bouton "Copy".
 
-- Migration: table `quotas(plan PK, monthly_rows, monthly_ai_calls, rate_limit_per_min)` + seed 3 plans (free/pro/enterprise).
-- Server functions (`src/lib/keys.functions.ts`):
-  - `createApiKey({ name })` → renvoie clé brute UNE seule fois (`ds_live_<32 hex>`), stocke `sha256(key)` + prefix 8 chars.
-  - `listApiKeys()`, `revokeApiKey(id)`.
-  - `getUsageSummary()` — agrège `usage_logs` du mois.
-- Middleware clé API dans `src/routes/api/public/v1/generate.ts`:
-  - Lit `X-API-Key`, hash, lookup en DB (admin client).
-  - Vérifie quota mensuel (somme `rows_generated` du mois).
-  - Logge la requête (status, durée, lignes, IA).
-  - 401 si manquante, 402 si quota dépassé, 429 si rate-limit (in-memory token bucket par clé).
-- Public endpoint reste callable sans clé seulement depuis l'origine (playground) — détection via header `Origin` matchant le domaine, sinon clé requise.
+Nouveau fichier de données: `src/lib/examples.ts` — 6 presets `{ id, label, description, schema, suggestedFormat, suggestedLocale }`.
 
-## 5. Pages console (refonte présentation produit)
+## 4. Refonte landing et dashboard pour intégrer tout ça
 
-Routes à créer/refondre:
+- `src/routes/index.tsx`:
+  - Hero: `Typewriter` sur le titre ("Schema in." → "JSON out." → "SQL out." → "CSV out."), `AuroraBackground` derrière, CTAs magnétiques.
+  - Section terminal: remplacée par `AnimatedTerminal` (vrai typing + révélation).
+  - Bande de stats: 4 `CountUp` (80 ms, 100k lignes, 10 locales, 5 formats).
+  - Toutes les sections wrappées dans `ScrollReveal` avec délais en cascade.
+  - Section "How it works" remplacée par le composant animé.
+  - Footer + CTA finale: `AuroraBackground` + texte gradient animé.
 
-- `/` — **Landing pro** (pas le playground) : hero + démo animée schéma→données + 3 features + tarifs + CTA login. Réelle présentation produit, design soigné, semantic tokens, animations subtiles.
-- `/playground` — l'éditeur actuel (déplacé depuis `/`), amélioré avec:
-  - Loading skeleton sur le panneau Résultat (pas un texte "Génération…").
-  - Onglets Schéma / Options / cURL.
-  - Bouton "Télécharger" (.sql, .json, .csv, .ts, .py).
-  - Bouton "Copier".
-  - Sélecteur dialecte SQL, locale, mode IA.
-- `/docs` — documentation statique des endpoints (`/v1/generate`, `/v1/analyze`, `/v1/formats`, `/v1/usage`), exemples curl + JS + Python, table des codes erreurs.
-- `/login`, `/signup` — auth Lovable Cloud (email/password + Google).
-- `/_authenticated.tsx` — guard.
-- `/_authenticated/dashboard` — usage du mois (lignes générées, appels IA, top endpoints) avec petits graphes (chart shadcn).
-- `/_authenticated/keys` — créer / révoquer clés. Modale "copy once".
-- `/_authenticated/history` — 50 derniers logs.
+- `src/routes/playground.tsx`:
+  - Ajout de `ExampleGallery` en haut (collapsible).
+  - Loader remplacé par `ProgressSteps`.
+  - Lecture `?example=` au mount pour pré-charger.
+  - Bouton "Generate" magnétique + `glow-pulse` quand prêt.
+  - Sortie révélée avec fade-in ligne-par-ligne (limité aux 80 premières lignes pour la perf).
 
-## 6. UX loading propre
+- `src/routes/_authenticated/dashboard.tsx`:
+  - Ajout d'`OnboardingChecklist` en haut si l'utilisateur n'a pas tout fait.
+  - `CountUp` sur les Stats au lieu de chiffres statiques.
+  - Skeletons mint shimmer au lieu de gris plat.
 
-- Skeleton shadcn sur les cartes pendant la génération.
-- Progress text : "Parsing schema…" → "Generating rows…" → "Serializing…" (basé sur le timing, pas du fake).
-- Toast d'erreur avec sonner.
-- Spinner sur les boutons (icône lucide `Loader2` qui spin).
+## 5. Évolutions transverses
 
-## 7. Détails techniques
+- `src/lib/keys.functions.ts` — `getUsageSummary` renvoie aussi `hasKey: boolean` et `hasCall: boolean` (count rapide sur `api_keys` et `usage_logs`).
+- `src/components/Navbar.tsx` — logo avec léger `glow-pulse`, lien actif souligné en mint.
+- Transitions de page: wrapper `PageTransition` (fade + slight slide) appliqué au `<Outlet />` du `__root.tsx`.
 
-- `src/routes/api/public/v1/analyze.ts`, `formats.ts`, `usage.ts` — petits endpoints listant le moteur.
-- `src/lib/engine/parser-sql.ts` — réécrit `colName`, ajoute extraction `dataType` robuste + tests inline (commentaires) avec le schéma users/messages.
-- `src/lib/engine/index.ts` — expose `analyzeOnly(schema)` pour l'endpoint /analyze et le mode IA.
-- Le bug d'hydration cURL (préviewt SSR vs client window.location) → remplacé par un placeholder statique `https://your-domain` côté SSR + remplacement client-side dans un `useEffect`.
-- Tous les composants utilisent les semantic tokens (`bg-background`, `text-foreground`, `bg-primary`, `text-primary-foreground`, `bg-muted`).
-- Animations: `motion` (déjà dispo via framer si pas installé sinon CSS pur).
+## 6. Stripe
 
-## 8. Découpage des commits (un seul tour, dans cet ordre)
+**Mis complètement de côté** pour ce tour. Aucune route `/billing`, aucun hook payment, aucune migration `stripe_customer_id`. Je te reproposerai Stripe BYOK (tes propres clés) quand tu seras prêt, jamais avant.
 
-1. Fix parser SQL + endpoint /analyze.
-2. Migration quotas + server functions clés/usage.
-3. Middleware clé API + guards quota dans /v1/generate + endpoints /formats /usage.
-4. Auth pages (login/signup) + layout `_authenticated`.
-5. Pages dashboard / keys / history.
-6. Refonte landing + extraction playground vers /playground + loading propre.
-7. Page /docs.
-8. Phase 2 enrichers + Phase 3 IA (à la fin pour ne pas bloquer le reste si IA flaky).
+# Hors scope (volontairement)
 
-## Out of scope (volontairement)
-
-- Webhooks de génération asynchrone (>10k lignes).
-- Templates communautaires.
-- Export ORM-ready Prisma/Drizzle.
-- Mode incremental.
+- Stripe / billing / quotas payants.
+- Nouveaux parsers (Prisma, TS interfaces).
+- Streaming >50k lignes.
 - CLI npm.
+- HIBP / CSP headers.
 
-À garder pour une phase ultérieure si tu valides la base.
+# Détails techniques
 
----
+- Toutes les animations respectent `prefers-reduced-motion`.
+- Pas de nouvelle dépendance: tout est fait en CSS keyframes + React state + `IntersectionObserver` natif. `motion` reste optionnel — pas installé si pas déjà présent.
+- Tokens sémantiques uniquement: pas de `text-white`, `bg-black`. Les nouvelles couleurs (si besoin) sont ajoutées dans `:root` de `src/styles.css`.
+- Aucune modification backend / DB / RLS / engine. Pure UI + presentation.
 
-Si le plan te va, je l'implémente d'un coup dans l'ordre ci-dessus.
+Si tu valides, j'enchaîne tout dans cet ordre: animations lib → styles.css → skeletons → onboarding → landing → playground → dashboard.
