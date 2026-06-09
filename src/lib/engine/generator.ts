@@ -197,6 +197,11 @@ export function generate(
     const spec = options.rowsPerTable?.[tName];
     const n = resolveRowCount(spec, table, defaultRows, resolvedCounts);
     resolvedCounts.set(tName, n);
+    const tableRows: Row[] = [];
+    const seenUnique = new Map<string, Set<string>>();
+    const pkCol = pickPkColumn(table);
+
+    for (let i = 0; i < n; i++) {
       const row: Row = {};
       for (const col of table.columns) {
         // Skip auto-increment columns; let the DB assign — but for SQL output we
