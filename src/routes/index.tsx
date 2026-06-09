@@ -340,14 +340,8 @@ function Bullet({ children }: { children: React.ReactNode }) {
   );
 }
 
-function StatBand({ value, label }: { value: React.ReactNode; label: string }) {
-  return (
-    <div className="bg-card/60 px-5 py-6 text-center transition-colors hover:bg-card">
-      <div className="text-2xl font-bold tracking-tight text-gradient sm:text-3xl">{value}</div>
-      <div className="mt-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">{label}</div>
-    </div>
-  );
-}
+
+
 
 function SectionHead({
   eyebrow, title, sub, align = "center",
