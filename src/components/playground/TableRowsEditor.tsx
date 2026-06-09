@@ -66,12 +66,8 @@ function resolveCount(
   return Math.round(pc * heuristicPerParent(table.name));
 }
 
-const PRESETS: Record<Preset, (t: ParsedTable, def: number) => RowSpec> = {
-  balanced: (t) => (t.columns.some((c) => c.fk) ? "auto" : def => def as any) as any,
-  sparse: () => 10,
-  dense: () => 100,
-  stress: () => 500,
-};
+const _PRESETS_UNUSED = null;
+
 
 export function TableRowsEditor({
   schema,
