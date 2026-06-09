@@ -163,7 +163,8 @@ function Playground() {
             warnings={[]}
           />
         </div>
-        </div>
+
+
 
         <div className="mt-6 grid gap-5 lg:grid-cols-5">
           {/* Schema editor */}
