@@ -204,18 +204,6 @@ function Playground() {
                     </SelectContent>
                   </Select>
                 </Field>
-                <Field label="Locale">
-                  <Select value={locale} onValueChange={setLocale}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="es">Español</SelectItem>
-                      <SelectItem value="de">Deutsch</SelectItem>
-                      <SelectItem value="ja">日本語</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
               </div>
 
               <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-3">
