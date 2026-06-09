@@ -153,6 +153,18 @@ function Playground() {
           <ExampleGallery onPick={pickExample} activeId={activeExample} />
         </div>
 
+        <div className="mt-5">
+          <TableRowsEditor
+            schema={schema}
+            defaultRows={rows}
+            onDefaultChange={setRows}
+            perTable={perTable}
+            onPerTableChange={setPerTable}
+            warnings={[]}
+          />
+        </div>
+        </div>
+
         <div className="mt-6 grid gap-5 lg:grid-cols-5">
           {/* Schema editor */}
           <Panel className="lg:col-span-3" title="schema.sql" badge="INPUT">
