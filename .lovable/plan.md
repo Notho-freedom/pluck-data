@@ -1,91 +1,107 @@
-# Pourquoi un plan
 
-Le résumé de la session précédente prétendait que les composants `Typewriter`, `AnimatedTerminal`, `ScrollReveal`, `CountUp`, `ProgressSteps`, `ExampleGallery`, `OnboardingChecklist` et `examples.ts` avaient été créés. **Aucun de ces fichiers n'existe réellement** dans le projet (`src/components/` ne contient que `Navbar.tsx` et `ui/`). C'est pour ça que tu ne vois aucune animation avancée. On reprend proprement, on livre vraiment, et on met Stripe complètement de côté.
+# Plan — UX fixes + smart generation config
 
-# Ce qui sera livré dans ce tour
+## 1. Landing page cleanup (`src/routes/index.tsx`)
 
-## 1. Bibliothèque d'animations (vraie, pas du fade-in basique)
+- **Terminal horizontal scroll**: in `AnimatedTerminal`, the `<pre>` blocks use `overflow-x-auto` and the side-by-side grid forces overflow at this viewport. Wrap long lines (`whitespace-pre-wrap break-words`), reduce font to `text-[12px]`, and stack the two panes (`grid md:grid-cols-2 → grid-cols-1 lg:grid-cols-2`) so nothing scrolls horizontally on common widths.
+- **Stats band**: delete the `StatBand` block (lines ~121-128) and its helper. Keep the "works with every stack" strip directly under the terminal.
 
-Nouveau dossier `src/components/animations/`:
+## 2. The real problem — "rows" is ambiguous
 
-- **Typewriter.tsx** — typing char-par-char avec curseur clignotant, support de plusieurs phrases en rotation, vitesse + delay configurables, respecte `prefers-reduced-motion`.
-- **AnimatedTerminal.tsx** — simule un terminal qui tape une commande SQL puis "exécute" et révèle ligne-par-ligne la sortie JSON/SQL générée, avec scanline et caret.
-- **ScrollReveal.tsx** — `IntersectionObserver`, déclenche `opacity + translateY + blur` une seule fois, props `delay`, `direction`, `as`.
-- **CountUp.tsx** — anime un nombre vers sa valeur cible avec easing, déclenché à l'entrée dans la vue, formatte (k/M/ms/%).
-- **Magnetic.tsx** — bouton/élément magnétique (suit légèrement le curseur), utilisé sur les CTAs principaux.
-- **AuroraBackground.tsx** — gradient animé conic-gradient + blob radiaux qui dérivent lentement, pour le hero et la section finale.
-- **GradientText.tsx** — texte avec gradient animé (déplacement du gradient en boucle).
+Today `options.rowsPerTable.default = 250` means **250 rows per table**, so 3 tables = 750 rows. The UI exposes a single "Rows / table" input, which is exactly the confusion the user hit (250 → 300 in the report because 3 tables × 100, capped).
 
-Mises à jour de `src/styles.css`:
-- Keyframes: `aurora-drift`, `gradient-shift`, `scanline`, `float-slow`, `reveal-up`, `glow-pulse`, `marquee`.
-- Utilitaires: `.animate-aurora`, `.animate-gradient`, `.animate-scanline`, `.animate-float`, `.animate-glow-pulse`, `.animate-marquee`.
-- Media query `@media (prefers-reduced-motion: reduce)` qui désactive tout proprement.
+We'll fix this on two fronts: **terminology** + **per-table control** + **smart defaults**.
 
-## 2. Skeletons et écrans de progression
+### 2a. Terminology
 
-Nouveau dossier `src/components/skeletons/`:
+- Rename the field everywhere from "Rows" → **"Rows per table"** with a tooltip: "Each table gets this many rows unless you override it below."
+- In the playground header, show: `≈ N tables × M rows = TOTAL rows` live as the user types.
+- In the report, show **rows per table** as the primary number, with `Total` as secondary.
 
-- **TableSkeleton.tsx**, **CardSkeleton.tsx**, **MetricSkeleton.tsx** — basés sur `ui/skeleton` mais avec shimmer mint discret.
-- **ProgressSteps.tsx** dans `src/components/` — composant multi-étapes (Parsing → Inferring → Generating → Serializing → Done) avec icônes Lucide, barre de progression linéaire, état actif/done/pending. Utilisé dans le Playground à la place du skeleton générique actuel.
-- Auth (login/signup): boutons avec spinner + état "Signing you in…" / "Creating your account…" plutôt que juste désactivé.
-- Export (copy/download): toast progressif + petit spinner sur le bouton pendant la sérialisation des gros payloads.
+### 2b. Per-table row count UI (Playground)
 
-## 3. Onboarding guidé
+After the user pastes/loads a schema, parse it client-side (call the existing `/api/public/v1/analyze` endpoint — already returns `tables[]`) and render a compact table:
 
-Nouveau dossier `src/components/onboarding/`:
+```text
+┌─ Tables detected ───────────────────────────┐
+│ users          [ 250 ] rows                 │
+│ conversations  [ 250 ] rows  ✕ link to users│
+│ messages       [auto] rows  — 5/user (~1250)│
+└─────────────────────────────────────────────┘
+   Reset · Apply preset: [Realistic ▾]
+```
 
-- **ExampleGallery.tsx** — galerie de 6 exemples cliquables (Chat app, E-commerce, SaaS billing, Blog CMS, CRM, Analytics events), chaque carte pré-remplit le Playground via état + query param `?example=chat`.
-- **OnboardingChecklist.tsx** — checklist sur le Dashboard (3 étapes: créer une clé, faire un premier appel, exporter un format), basée sur `hasKey`/`hasCall` que renvoie déjà `getUsageSummary` (à étendre).
-- **HowItWorks.tsx** — section landing "3 étapes animées" avec connexion entre les étapes (ligne qui se dessine au scroll).
-- **TryItIn10s.tsx** — bloc sticky landing avec snippet cURL + bouton "Copy".
+- Each row: numeric input + an `auto` toggle.
+- "Auto" uses **relationship-aware defaults** (see 2c).
+- A "Realistic / Sparse / Dense / Stress-test" preset dropdown bulk-fills sensible numbers.
 
-Nouveau fichier de données: `src/lib/examples.ts` — 6 presets `{ id, label, description, schema, suggestedFormat, suggestedLocale }`.
+### 2c. Smart defaults (engine)
 
-## 4. Refonte landing et dashboard pour intégrer tout ça
+Extend `src/lib/engine/generator.ts` + `types.ts` so `rowsPerTable` accepts:
 
-- `src/routes/index.tsx`:
-  - Hero: `Typewriter` sur le titre ("Schema in." → "JSON out." → "SQL out." → "CSV out."), `AuroraBackground` derrière, CTAs magnétiques.
-  - Section terminal: remplacée par `AnimatedTerminal` (vrai typing + révélation).
-  - Bande de stats: 4 `CountUp` (80 ms, 100k lignes, 10 locales, 5 formats).
-  - Toutes les sections wrappées dans `ScrollReveal` avec délais en cascade.
-  - Section "How it works" remplacée par le composant animé.
-  - Footer + CTA finale: `AuroraBackground` + texte gradient animé.
+- a **number** → fixed count (today's behaviour)
+- `"auto"` → resolved from the table's role in the FK graph:
+  - **Root tables** (no incoming FKs, e.g. `users`): use `default` (e.g. 250).
+  - **1-to-many child** (e.g. `conversations.user_id`): `parentCount × ratio`, ratio defaults per heuristic (2-5 conversations / user).
+  - **Many-to-many join / message-like**: `parentCount × 5..20`.
+  - Heuristic uses table name (`messages`, `comments`, `events`, `logs`, `orders`, `items`) + column patterns.
+- Per-table objects: `{ count: 250 }` or `{ perParent: 5, parent: "users" }`.
 
-- `src/routes/playground.tsx`:
-  - Ajout de `ExampleGallery` en haut (collapsible).
-  - Loader remplacé par `ProgressSteps`.
-  - Lecture `?example=` au mount pour pré-charger.
-  - Bouton "Generate" magnétique + `glow-pulse` quand prêt.
-  - Sortie révélée avec fade-in ligne-par-ligne (limité aux 80 premières lignes pour la perf).
+This makes "250 users" actually produce ~250 users, ~750 conversations, ~3.7k messages — which matches what a developer wants from "a chat app with 250 users".
 
-- `src/routes/_authenticated/dashboard.tsx`:
-  - Ajout d'`OnboardingChecklist` en haut si l'utilisateur n'a pas tout fait.
-  - `CountUp` sur les Stats au lieu de chiffres statiques.
-  - Skeletons mint shimmer au lieu de gris plat.
+## 3. Schema-in / data-out config layer
 
-## 5. Évolutions transverses
+Add an optional **`.dataseed.json`** config users can paste/upload alongside their schema (also accepted in the API body as `options.tableConfig`). It lets advanced users pin behaviour without UI:
 
-- `src/lib/keys.functions.ts` — `getUsageSummary` renvoie aussi `hasKey: boolean` et `hasCall: boolean` (count rapide sur `api_keys` et `usage_logs`).
-- `src/components/Navbar.tsx` — logo avec léger `glow-pulse`, lien actif souligné en mint.
-- Transitions de page: wrapper `PageTransition` (fade + slight slide) appliqué au `<Outlet />` du `__root.tsx`.
+```json
+{
+  "tables": {
+    "users":         { "rows": 250 },
+    "conversations": { "rows": { "perParent": 3, "parent": "users" } },
+    "messages":      { "rows": { "perParent": 12, "parent": "conversations" } }
+  },
+  "columns": {
+    "users.email":   { "faker": "internet.email", "unique": true },
+    "users.country": { "values": ["FR", "BE", "CH"] }
+  },
+  "locale": "fr",
+  "seed": 42
+}
+```
 
-## 6. Stripe
+- Playground gets a small "Advanced config" collapsible that shows/edits this JSON, auto-synced with the per-table UI above.
+- `/v1/generate` accepts it; documented in `/docs`.
 
-**Mis complètement de côté** pour ce tour. Aucune route `/billing`, aucun hook payment, aucune migration `stripe_customer_id`. Je te reproposerai Stripe BYOK (tes propres clés) quand tu seras prêt, jamais avant.
+## 4. Quality-of-life additions
 
-# Hors scope (volontairement)
+- **Inline schema linter**: after parsing, surface warnings (orphan FK, missing PK, ambiguous types) in a top banner of the playground — not just buried in `report.warnings`.
+- **Output preview tabs**: when in `per-table` mode, render a tab per table with row count; today we only collapse to a single string.
+- **"Insert into my DB" snippet**: after generation, offer a one-click copy of `psql`/`mysql` command using the produced file.
+- **Estimator before submit**: client-side estimate of total rows + payload size + warning if it'll exceed the free-tier 100/table cap.
 
-- Stripe / billing / quotas payants.
-- Nouveaux parsers (Prisma, TS interfaces).
-- Streaming >50k lignes.
-- CLI npm.
-- HIBP / CSP headers.
+## 5. Engine + API changes (technical)
 
-# Détails techniques
+Files touched:
 
-- Toutes les animations respectent `prefers-reduced-motion`.
-- Pas de nouvelle dépendance: tout est fait en CSS keyframes + React state + `IntersectionObserver` natif. `motion` reste optionnel — pas installé si pas déjà présent.
-- Tokens sémantiques uniquement: pas de `text-white`, `bg-black`. Les nouvelles couleurs (si besoin) sont ajoutées dans `:root` de `src/styles.css`.
-- Aucune modification backend / DB / RLS / engine. Pure UI + presentation.
+- `src/lib/engine/types.ts` — extend `GenerateOptions.rowsPerTable` value type to `number | "auto" | { perParent: number; parent: string } | { count: number }`. Add `tableConfig`, `columnConfig`.
+- `src/lib/engine/generator.ts` — resolve row counts per table after topo sort using FK graph + heuristics; apply `columnConfig` overrides (faker path, enum values, unique).
+- `src/lib/engine/graph.ts` — expose `incomingEdges(table)` helper for the resolver.
+- `src/routes/api/public/v1/generate.ts` — pass through the new fields; same 1 MB cap; same anon 100/table cap applied *after* resolution.
+- `src/routes/playground.tsx` — add `TableRowsEditor` (calls `/v1/analyze` on schema change, debounced), totals badge, presets dropdown, advanced JSON drawer, output tabs.
+- `src/routes/docs.tsx` — document `rowsPerTable` auto/perParent shapes and `.dataseed.json`.
+- `src/routes/index.tsx` — terminal wrap fix + remove stats band.
 
-Si tu valides, j'enchaîne tout dans cet ordre: animations lib → styles.css → skeletons → onboarding → landing → playground → dashboard.
+## 6. Out of scope for this round
+
+- Stripe / billing (still parked).
+- Saved configs in DB (could come later as `user_configs` table).
+- File-upload of `.sql` (already partially there; not changing).
+
+## Acceptance checklist
+
+- [ ] Landing terminal does not scroll horizontally at ≥1024px and wraps cleanly below.
+- [ ] Stats band gone.
+- [ ] Pasting the chat schema + setting `users=250` produces ~250 users, with conversations/messages scaled by relationship — and report shows per-table + total clearly.
+- [ ] Per-table editor appears after schema is parsed; "auto" resolves visibly.
+- [ ] `/v1/generate` accepts the new `rowsPerTable` shapes; existing flat-number requests still work.
+- [ ] Docs updated with the new shape + a `.dataseed.json` example.
