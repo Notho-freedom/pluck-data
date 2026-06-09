@@ -69,7 +69,7 @@ export function AnimatedTerminal({
   return (
     <div className="grid gap-3 rounded-2xl border border-border/80 bg-card/60 p-3 shadow-elevated backdrop-blur-sm lg:grid-cols-[1fr_auto_1.15fr] lg:items-stretch">
       <Pane title={inputTitle} badge="INPUT" lang="sql">
-        <pre className="overflow-x-auto p-5 text-[12.5px] leading-relaxed font-mono text-foreground/90">
+        <pre className="whitespace-pre-wrap break-words p-5 text-[12px] leading-relaxed font-mono text-foreground/90">
           <code>{typed}</code>
           {phase === "typing" && <span className="caret" />}
         </pre>
@@ -86,7 +86,7 @@ export function AnimatedTerminal({
         </div>
       </div>
       <Pane title={outputTitle} badge="OUTPUT" lang="sql" accent>
-        <pre className="overflow-x-auto p-5 text-[12.5px] leading-relaxed font-mono text-foreground/90 min-h-[220px]">
+        <pre className="whitespace-pre-wrap break-words p-5 text-[12px] leading-relaxed font-mono text-foreground/90 min-h-[220px]">
           {phase === "typing" && (
             <span className="text-muted-foreground/60">// awaiting input…</span>
           )}

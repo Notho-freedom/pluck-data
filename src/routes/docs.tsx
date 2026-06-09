@@ -52,12 +52,22 @@ function Docs() {
               "mode":   "single" | "per-table",
               "sql_dialect": "postgres" | "mysql" | "sqlite" },
   "options": {
-    "rowsPerTable": { "default": 10, "users": 50 },
+    "rowsPerTable": {
+      "default": 10,                                 // applied to any table not listed
+      "users":         250,                          // fixed count
+      "conversations": "auto",                       // scale from FK parent (heuristic)
+      "messages":      { "perParent": 12, "parent": "conversations" }
+    },
     "locale": "fr",
     "seed": 42,
     "ai_enrichment": "off" | "validate" | "fill-gaps" | "full"
   }
 }`}</Pre>
+            <p className="mt-3 text-xs text-muted-foreground">
+              <b>rowsPerTable</b> values: <code>number</code> (fixed), <code>"auto"</code>{" "}
+              (resolves from the FK graph + table-name heuristic), or{" "}
+              <code>{`{ perParent, parent }`}</code> for explicit ratios.
+            </p>
             <h4 className="mt-4 font-semibold text-foreground">Response</h4>
             <Pre>{`{
   "schema": { "tables": [...] },

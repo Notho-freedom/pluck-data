@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { Typewriter } from "@/components/animations/Typewriter";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
-import { CountUp } from "@/components/animations/CountUp";
+
 import { Magnetic } from "@/components/animations/Magnetic";
 import { AuroraBackground } from "@/components/animations/AuroraBackground";
 import { AnimatedTerminal } from "@/components/animations/AnimatedTerminal";
@@ -117,15 +117,8 @@ function Landing() {
             </div>
           </ScrollReveal>
 
-          {/* Stats band */}
-          <ScrollReveal delay={200}>
-            <div className="mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-xl border border-border/80 bg-border/60 md:grid-cols-4">
-              <StatBand value={<CountUp to={80} suffix="ms" />} label="median latency" />
-              <StatBand value={<CountUp to={100} suffix="k" />} label="rows / call" />
-              <StatBand value={<CountUp to={10} suffix="+" />} label="locales" />
-              <StatBand value={<CountUp to={5} />} label="output formats" />
-            </div>
-          </ScrollReveal>
+
+
 
           {/* Logos / trust */}
           <ScrollReveal delay={280}>
@@ -347,14 +340,8 @@ function Bullet({ children }: { children: React.ReactNode }) {
   );
 }
 
-function StatBand({ value, label }: { value: React.ReactNode; label: string }) {
-  return (
-    <div className="bg-card/60 px-5 py-6 text-center transition-colors hover:bg-card">
-      <div className="text-2xl font-bold tracking-tight text-gradient sm:text-3xl">{value}</div>
-      <div className="mt-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">{label}</div>
-    </div>
-  );
-}
+
+
 
 function SectionHead({
   eyebrow, title, sub, align = "center",

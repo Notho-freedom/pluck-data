@@ -5,16 +5,17 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Navbar } from "@/components/Navbar";
 import { ProgressSteps } from "@/components/ProgressSteps";
 import { ExampleGallery } from "@/components/onboarding/ExampleGallery";
-import { ScrollReveal } from "@/components/animations/ScrollReveal";
+
 import { CountUp } from "@/components/animations/CountUp";
 import { Magnetic } from "@/components/animations/Magnetic";
 import { EXAMPLES, type SchemaExample } from "@/lib/examples";
+import { TableRowsEditor, type RowSpec } from "@/components/playground/TableRowsEditor";
 
 export const Route = createFileRoute("/playground")({
   validateSearch: (s: Record<string, unknown>) => ({ example: typeof s.example === "string" ? s.example : undefined }),
@@ -51,6 +52,7 @@ function Playground() {
   const [locale, setLocale] = useState("fr");
   const [aiMode, setAiMode] = useState<"off" | "validate">("off");
   const [rows, setRows] = useState(10);
+  const [perTable, setPerTable] = useState<Record<string, RowSpec>>({});
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<any>(null);
@@ -68,7 +70,12 @@ function Playground() {
         body: JSON.stringify({
           input: { type: "auto", files: [{ name: "schema.sql", content: schema }] },
           output: { format, mode: "single", sql_dialect: dialect },
-          options: { rowsPerTable: { default: rows }, seed: 42, locale, ai_enrichment: aiMode },
+          options: {
+            rowsPerTable: { default: rows, ...perTable },
+            seed: 42,
+            locale,
+            ai_enrichment: aiMode,
+          },
         }),
       });
       const data = await res.json();
@@ -146,6 +153,19 @@ function Playground() {
           <ExampleGallery onPick={pickExample} activeId={activeExample} />
         </div>
 
+        <div className="mt-5">
+          <TableRowsEditor
+            schema={schema}
+            defaultRows={rows}
+            onDefaultChange={setRows}
+            perTable={perTable}
+            onPerTableChange={setPerTable}
+            warnings={[]}
+          />
+        </div>
+
+
+
         <div className="mt-6 grid gap-5 lg:grid-cols-5">
           {/* Schema editor */}
           <Panel className="lg:col-span-3" title="schema.sql" badge="INPUT">
@@ -175,19 +195,6 @@ function Playground() {
                     </SelectContent>
                   </Select>
                 </Field>
-                <Field label="Rows / table">
-                  <Input type="number" min={1} max={500} value={rows} onChange={(e) => setRows(Number(e.target.value))} />
-                </Field>
-                <Field label="SQL dialect">
-                  <Select value={dialect} onValueChange={(v) => setDialect(v as any)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="postgres">PostgreSQL</SelectItem>
-                      <SelectItem value="mysql">MySQL</SelectItem>
-                      <SelectItem value="sqlite">SQLite</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
                 <Field label="Locale">
                   <Select value={locale} onValueChange={setLocale}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
@@ -197,6 +204,16 @@ function Playground() {
                       <SelectItem value="es">Español</SelectItem>
                       <SelectItem value="de">Deutsch</SelectItem>
                       <SelectItem value="ja">日本語</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="SQL dialect">
+                  <Select value={dialect} onValueChange={(v) => setDialect(v as any)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="postgres">PostgreSQL</SelectItem>
+                      <SelectItem value="mysql">MySQL</SelectItem>
+                      <SelectItem value="sqlite">SQLite</SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
@@ -223,11 +240,24 @@ function Playground() {
               <div className="rounded-xl border border-border/80 bg-card/60 p-5 animate-fade-in">
                 <h3 className="text-sm font-semibold">Report</h3>
                 <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
-                  <Metric label="Rows" value={<CountUp to={report.totalRows} />} />
+                  <Metric label="Total rows" value={<CountUp to={report.totalRows} />} />
                   <Metric label="Duration" value={<><CountUp to={report.durationMs} />ms</>} />
                   {report.aiCalls > 0 && <Metric label="AI calls" value={String(report.aiCalls)} />}
                   {report.domain && <Metric label="Domain" value={report.domain} />}
                 </dl>
+                {report.perTable && (
+                  <div className="mt-3 rounded-md border border-border/60 bg-background/40 p-2.5">
+                    <p className="mb-1.5 text-[10px] font-mono uppercase tracking-wide text-muted-foreground">Per table</p>
+                    <ul className="space-y-0.5 font-mono text-xs">
+                      {Object.entries(report.perTable as Record<string, number>).map(([t, n]) => (
+                        <li key={t} className="flex justify-between">
+                          <span className="text-foreground">{t}</span>
+                          <span className="text-muted-foreground">{n.toLocaleString()} rows</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 {report.warnings?.length > 0 && (
                   <p className="mt-3 text-xs text-amber-400">⚠ {report.warnings.join(" · ")}</p>
                 )}
