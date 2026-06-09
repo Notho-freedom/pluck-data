@@ -52,6 +52,7 @@ function Playground() {
   const [locale, setLocale] = useState("fr");
   const [aiMode, setAiMode] = useState<"off" | "validate">("off");
   const [rows, setRows] = useState(10);
+  const [perTable, setPerTable] = useState<Record<string, RowSpec>>({});
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<any>(null);
