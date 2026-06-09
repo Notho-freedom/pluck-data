@@ -70,7 +70,12 @@ function Playground() {
         body: JSON.stringify({
           input: { type: "auto", files: [{ name: "schema.sql", content: schema }] },
           output: { format, mode: "single", sql_dialect: dialect },
-          options: { rowsPerTable: { default: rows }, seed: 42, locale, ai_enrichment: aiMode },
+          options: {
+            rowsPerTable: { default: rows, ...perTable },
+            seed: 42,
+            locale,
+            ai_enrichment: aiMode,
+          },
         }),
       });
       const data = await res.json();
