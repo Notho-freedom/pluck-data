@@ -15,6 +15,7 @@ import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { CountUp } from "@/components/animations/CountUp";
 import { Magnetic } from "@/components/animations/Magnetic";
 import { EXAMPLES, type SchemaExample } from "@/lib/examples";
+import { TableRowsEditor, type RowSpec } from "@/components/playground/TableRowsEditor";
 
 export const Route = createFileRoute("/playground")({
   validateSearch: (s: Record<string, unknown>) => ({ example: typeof s.example === "string" ? s.example : undefined }),
