@@ -240,11 +240,24 @@ function Playground() {
               <div className="rounded-xl border border-border/80 bg-card/60 p-5 animate-fade-in">
                 <h3 className="text-sm font-semibold">Report</h3>
                 <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
-                  <Metric label="Rows" value={<CountUp to={report.totalRows} />} />
+                  <Metric label="Total rows" value={<CountUp to={report.totalRows} />} />
                   <Metric label="Duration" value={<><CountUp to={report.durationMs} />ms</>} />
                   {report.aiCalls > 0 && <Metric label="AI calls" value={String(report.aiCalls)} />}
                   {report.domain && <Metric label="Domain" value={report.domain} />}
                 </dl>
+                {report.perTable && (
+                  <div className="mt-3 rounded-md border border-border/60 bg-background/40 p-2.5">
+                    <p className="mb-1.5 text-[10px] font-mono uppercase tracking-wide text-muted-foreground">Per table</p>
+                    <ul className="space-y-0.5 font-mono text-xs">
+                      {Object.entries(report.perTable as Record<string, number>).map(([t, n]) => (
+                        <li key={t} className="flex justify-between">
+                          <span className="text-foreground">{t}</span>
+                          <span className="text-muted-foreground">{n.toLocaleString()} rows</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 {report.warnings?.length > 0 && (
                   <p className="mt-3 text-xs text-amber-400">⚠ {report.warnings.join(" · ")}</p>
                 )}
