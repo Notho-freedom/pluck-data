@@ -49,8 +49,22 @@ export interface UnifiedSchema {
 export type OutputFormat = "sql" | "json" | "csv" | "typescript" | "python";
 export type OutputMode = "single" | "per-table";
 
+/**
+ * Row count spec per table.
+ * - number: fixed row count
+ * - "auto": resolved from FK graph + heuristics
+ * - { perParent, parent }: rows = parentCount × perParent
+ * - { count }: same as number
+ */
+export type RowSpec =
+  | number
+  | "auto"
+  | { count: number }
+  | { perParent: number; parent: string };
+
 export interface GenerateOptions {
-  rowsPerTable?: Record<string, number> & { default?: number };
+  /** Per-table row counts. Special key `default` applies to any unspecified table. */
+  rowsPerTable?: Record<string, RowSpec> & { default?: RowSpec };
   locale?: string;
   seed?: number;
   realism?: "basic" | "enriched";
