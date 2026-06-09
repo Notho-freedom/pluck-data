@@ -117,15 +117,8 @@ function Landing() {
             </div>
           </ScrollReveal>
 
-          {/* Stats band */}
-          <ScrollReveal delay={200}>
-            <div className="mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-xl border border-border/80 bg-border/60 md:grid-cols-4">
-              <StatBand value={<CountUp to={80} suffix="ms" />} label="median latency" />
-              <StatBand value={<CountUp to={100} suffix="k" />} label="rows / call" />
-              <StatBand value={<CountUp to={10} suffix="+" />} label="locales" />
-              <StatBand value={<CountUp to={5} />} label="output formats" />
-            </div>
-          </ScrollReveal>
+
+
 
           {/* Logos / trust */}
           <ScrollReveal delay={280}>
