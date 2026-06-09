@@ -5,6 +5,7 @@ import type {
   GeneratedDataset,
   GenerateOptions,
   Row,
+  RowSpec,
   Table,
   UnifiedSchema,
 } from "./types";
