@@ -140,6 +140,38 @@ function pickPkColumn(table: Table): Column | undefined {
   );
 }
 
+function heuristicPerParent(tableName: string): number {
+  const n = tableName.toLowerCase();
+  if (/messages?|events?|logs?|activity|activities|notifications?/.test(n)) return 12;
+  if (/comments?|reactions?|likes?|views?/.test(n)) return 8;
+  if (/items?|line_?items?|order_?lines?/.test(n)) return 4;
+  if (/orders?|posts?|tasks?|sessions?/.test(n)) return 3;
+  return 3;
+}
+
+function resolveRowCount(
+  spec: RowSpec | undefined,
+  table: Table,
+  defaultRows: number,
+  resolved: Map<string, number>,
+): number {
+  const clamp = (n: number) => Math.max(0, Math.min(100_000, Math.round(n)));
+  if (spec === undefined) return clamp(defaultRows);
+  if (typeof spec === "number") return clamp(spec);
+  if (typeof spec === "object" && "count" in spec) return clamp(spec.count);
+  if (typeof spec === "object" && "perParent" in spec) {
+    const pc = resolved.get(spec.parent) ?? defaultRows;
+    return clamp(pc * spec.perParent);
+  }
+  // "auto"
+  const fkCols = table.columns.filter((c) => c.fk);
+  if (fkCols.length === 0) return clamp(defaultRows);
+  // Pick the primary parent: first FK that is also unique-ish or the first one
+  const parent = fkCols[0]!.fk!.table;
+  const parentCount = resolved.get(parent) ?? defaultRows;
+  return clamp(parentCount * heuristicPerParent(table.name));
+}
+
 export function generate(
   schema: UnifiedSchema,
   options: GenerateOptions = {},
@@ -149,18 +181,22 @@ export function generate(
   const tableMap = new Map(schema.tables.map((t) => [t.name, t]));
   const rows: Record<string, Row[]> = {};
   const parentPks = new Map<string, unknown[]>();
+  const resolvedCounts = new Map<string, number>();
 
-  const defaultRows = options.rowsPerTable?.default ?? 10;
+  const defaultSpec = options.rowsPerTable?.default;
+  const defaultRows =
+    typeof defaultSpec === "number"
+      ? defaultSpec
+      : typeof defaultSpec === "object" && defaultSpec && "count" in defaultSpec
+        ? defaultSpec.count
+        : 10;
 
   for (const tName of order) {
     const table = tableMap.get(tName);
     if (!table) continue;
-    const n = options.rowsPerTable?.[tName] ?? defaultRows;
-    const tableRows: Row[] = [];
-    const seenUnique = new Map<string, Set<string>>();
-    const pkCol = pickPkColumn(table);
-
-    for (let i = 0; i < n; i++) {
+    const spec = options.rowsPerTable?.[tName];
+    const n = resolveRowCount(spec, table, defaultRows, resolvedCounts);
+    resolvedCounts.set(tName, n);
       const row: Row = {};
       for (const col of table.columns) {
         // Skip auto-increment columns; let the DB assign — but for SQL output we
