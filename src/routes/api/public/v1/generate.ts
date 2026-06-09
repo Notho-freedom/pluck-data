@@ -80,13 +80,18 @@ export const Route = createFileRoute("/api/public/v1/generate")({
             );
           }
 
-          // Soft cap on rows for unauthenticated playground use
+          // Soft cap on rows for unauthenticated playground use (per-table cap = 100)
           if (!apiKey) {
             const opts = (body.options ??= {});
             const rpt = (opts.rowsPerTable ??= {});
-            if (typeof rpt.default !== "number" || rpt.default > 100) rpt.default = Math.min(rpt.default ?? 10, 100);
+            const capNum = (v: any) =>
+              typeof v === "number" ? Math.min(v, 100) : v;
+            for (const k of Object.keys(rpt)) rpt[k] = capNum(rpt[k]);
+            if (typeof rpt.default !== "number") rpt.default = 10;
+            else rpt.default = Math.min(rpt.default, 100);
             opts.ai_enrichment = "off";
           }
+
 
           const result = await runGeneration(body);
 
