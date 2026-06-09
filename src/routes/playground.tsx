@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Navbar } from "@/components/Navbar";
 import { ProgressSteps } from "@/components/ProgressSteps";
 import { ExampleGallery } from "@/components/onboarding/ExampleGallery";
-import { ScrollReveal } from "@/components/animations/ScrollReveal";
+
 import { CountUp } from "@/components/animations/CountUp";
 import { Magnetic } from "@/components/animations/Magnetic";
 import { EXAMPLES, type SchemaExample } from "@/lib/examples";
