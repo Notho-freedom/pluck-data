@@ -182,8 +182,17 @@ function Playground() {
                     </SelectContent>
                   </Select>
                 </Field>
-                <Field label="Rows / table">
-                  <Input type="number" min={1} max={500} value={rows} onChange={(e) => setRows(Number(e.target.value))} />
+                <Field label="Locale">
+                  <Select value={locale} onValueChange={setLocale}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="de">Deutsch</SelectItem>
+                      <SelectItem value="ja">日本語</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </Field>
                 <Field label="SQL dialect">
                   <Select value={dialect} onValueChange={(v) => setDialect(v as any)}>
