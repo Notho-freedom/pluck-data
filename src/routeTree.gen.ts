@@ -15,10 +15,12 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiMcpRouteImport } from './routes/api/mcp'
 import { Route as AuthenticatedKeysRouteImport } from './routes/_authenticated/keys'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ApiPublicV1UsageRouteImport } from './routes/api/public/v1/usage'
+import { Route as ApiPublicV1InsertRouteImport } from './routes/api/public/v1/insert'
 import { Route as ApiPublicV1GenerateRouteImport } from './routes/api/public/v1/generate'
 import { Route as ApiPublicV1FormatsRouteImport } from './routes/api/public/v1/formats'
 import { Route as ApiPublicV1AnalyzeRouteImport } from './routes/api/public/v1/analyze'
@@ -52,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMcpRoute = ApiMcpRouteImport.update({
+  id: '/api/mcp',
+  path: '/api/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedKeysRoute = AuthenticatedKeysRouteImport.update({
   id: '/keys',
   path: '/keys',
@@ -70,6 +77,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 const ApiPublicV1UsageRoute = ApiPublicV1UsageRouteImport.update({
   id: '/api/public/v1/usage',
   path: '/api/public/v1/usage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1InsertRoute = ApiPublicV1InsertRouteImport.update({
+  id: '/api/public/v1/insert',
+  path: '/api/public/v1/insert',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicV1GenerateRoute = ApiPublicV1GenerateRouteImport.update({
@@ -97,9 +109,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/keys': typeof AuthenticatedKeysRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
   '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
   '/api/public/v1/generate': typeof ApiPublicV1GenerateRoute
+  '/api/public/v1/insert': typeof ApiPublicV1InsertRoute
   '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
 }
 export interface FileRoutesByTo {
@@ -111,9 +125,11 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/keys': typeof AuthenticatedKeysRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
   '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
   '/api/public/v1/generate': typeof ApiPublicV1GenerateRoute
+  '/api/public/v1/insert': typeof ApiPublicV1InsertRoute
   '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
 }
 export interface FileRoutesById {
@@ -127,9 +143,11 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/keys': typeof AuthenticatedKeysRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
   '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
   '/api/public/v1/generate': typeof ApiPublicV1GenerateRoute
+  '/api/public/v1/insert': typeof ApiPublicV1InsertRoute
   '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
 }
 export interface FileRouteTypes {
@@ -143,9 +161,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/keys'
+    | '/api/mcp'
     | '/api/public/v1/analyze'
     | '/api/public/v1/formats'
     | '/api/public/v1/generate'
+    | '/api/public/v1/insert'
     | '/api/public/v1/usage'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -157,9 +177,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/keys'
+    | '/api/mcp'
     | '/api/public/v1/analyze'
     | '/api/public/v1/formats'
     | '/api/public/v1/generate'
+    | '/api/public/v1/insert'
     | '/api/public/v1/usage'
   id:
     | '__root__'
@@ -172,9 +194,11 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/history'
     | '/_authenticated/keys'
+    | '/api/mcp'
     | '/api/public/v1/analyze'
     | '/api/public/v1/formats'
     | '/api/public/v1/generate'
+    | '/api/public/v1/insert'
     | '/api/public/v1/usage'
   fileRoutesById: FileRoutesById
 }
@@ -185,9 +209,11 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PlaygroundRoute: typeof PlaygroundRoute
   SignupRoute: typeof SignupRoute
+  ApiMcpRoute: typeof ApiMcpRoute
   ApiPublicV1AnalyzeRoute: typeof ApiPublicV1AnalyzeRoute
   ApiPublicV1FormatsRoute: typeof ApiPublicV1FormatsRoute
   ApiPublicV1GenerateRoute: typeof ApiPublicV1GenerateRoute
+  ApiPublicV1InsertRoute: typeof ApiPublicV1InsertRoute
   ApiPublicV1UsageRoute: typeof ApiPublicV1UsageRoute
 }
 
@@ -235,6 +261,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/mcp': {
+      id: '/api/mcp'
+      path: '/api/mcp'
+      fullPath: '/api/mcp'
+      preLoaderRoute: typeof ApiMcpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/keys': {
       id: '/_authenticated/keys'
       path: '/keys'
@@ -261,6 +294,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/v1/usage'
       fullPath: '/api/public/v1/usage'
       preLoaderRoute: typeof ApiPublicV1UsageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/insert': {
+      id: '/api/public/v1/insert'
+      path: '/api/public/v1/insert'
+      fullPath: '/api/public/v1/insert'
+      preLoaderRoute: typeof ApiPublicV1InsertRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/v1/generate': {
@@ -310,9 +350,11 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PlaygroundRoute: PlaygroundRoute,
   SignupRoute: SignupRoute,
+  ApiMcpRoute: ApiMcpRoute,
   ApiPublicV1AnalyzeRoute: ApiPublicV1AnalyzeRoute,
   ApiPublicV1FormatsRoute: ApiPublicV1FormatsRoute,
   ApiPublicV1GenerateRoute: ApiPublicV1GenerateRoute,
+  ApiPublicV1InsertRoute: ApiPublicV1InsertRoute,
   ApiPublicV1UsageRoute: ApiPublicV1UsageRoute,
 }
 export const routeTree = rootRouteImport
