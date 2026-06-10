@@ -24,6 +24,7 @@ export interface ParsedTable {
 export type RowSpec =
   | number
   | "auto"
+  | { count: number }
   | { perParent: number; parent: string };
 
 interface Props {

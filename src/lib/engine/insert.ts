@@ -99,7 +99,7 @@ async function insertNeonHttp(
         return `'${String(v).replace(/'/g, "''")}'`;
       }).join(",");
       try {
-        await sql(`INSERT INTO ${quote(tName)} (${colSql}) VALUES (${vals}) ON CONFLICT DO NOTHING`);
+        await sql.query(`INSERT INTO ${quote(tName)} (${colSql}) VALUES (${vals}) ON CONFLICT DO NOTHING`);
         ok++;
       } catch (e) {
         errors.push({ table: tName, error: e instanceof Error ? e.message : "Unknown" });
