@@ -1,5 +1,4 @@
-// Core types for the DataSeed generation engine.
-// Pure types — safe to import from anywhere (client or server).
+// Core types for the DataSeed v3 engine. Pure types only.
 
 export type ColumnKind =
   | "string"
@@ -13,12 +12,15 @@ export type ColumnKind =
   | "uuid"
   | "json"
   | "enum"
+  | "array"
+  | "vector"
+  | "geo-point"
+  | "inet"
+  | "interval"
+  | "bytea"
   | "unknown";
 
-export interface ForeignKey {
-  table: string;
-  column: string;
-}
+export interface ForeignKey { table: string; column: string }
 
 export interface Column {
   name: string;
@@ -31,8 +33,15 @@ export interface Column {
   maxLength?: number;
   enumValues?: string[];
   fk?: ForeignKey;
-  /** Original DB type token, e.g. "VARCHAR(255)" */
   rawType?: string;
+  /** For vector(N), array element kind, etc. */
+  meta?: {
+    vectorDim?: number;
+    arrayOf?: ColumnKind;
+    check?: string;        // raw CHECK expression (best-effort)
+    min?: number;
+    max?: number;
+  };
 }
 
 export interface Table {
@@ -42,38 +51,57 @@ export interface Table {
 
 export interface UnifiedSchema {
   tables: Table[];
-  /** Optional source dialect for SQL output. */
   dialect?: "postgres" | "mysql" | "sqlite";
+  /** Parser that produced this schema (sql, prisma, drizzle, zod, openapi, json) */
+  source?: string;
 }
 
 export type OutputFormat = "sql" | "json" | "csv" | "typescript" | "python";
 export type OutputMode = "single" | "per-table";
 
-/**
- * Row count spec per table.
- * - number: fixed row count
- * - "auto": resolved from FK graph + heuristics
- * - { perParent, parent }: rows = parentCount × perParent
- * - { count }: same as number
- */
 export type RowSpec =
   | number
   | "auto"
   | { count: number }
   | { perParent: number; parent: string };
 
+/** Per-column asset strategy. */
+export type AssetStrategy =
+  | "dicebear"
+  | "pravatar"
+  | "picsum"
+  | "unsplash"
+  | "ai"
+  | "none";
+
+export interface AssetSpec {
+  strategy: AssetStrategy;
+  /** Optional keyword for unsplash/AI (defaults to table-name derived) */
+  keyword?: string;
+  /** width, height for image URLs */
+  width?: number;
+  height?: number;
+  /** dicebear style (avataaars, lorelei, notionists…) */
+  style?: string;
+}
+
 export interface GenerateOptions {
-  /** Per-table row counts. Special key `default` applies to any unspecified table. */
   rowsPerTable?: Record<string, RowSpec> & { default?: RowSpec };
+  /** Map "table.column" or "*.column" → asset strategy. */
+  assets?: Record<string, AssetSpec | AssetStrategy>;
   locale?: string;
   seed?: number;
   realism?: "basic" | "enriched";
   ai_enrichment?: "off" | "validate" | "fill-gaps" | "full";
+  /** Forced domain hint (medical, ecommerce, crm, finance, saas, education, logistics, realestate). */
+  domain?: string;
+  /** Enable persona-based coherence (default true) */
+  coherence?: boolean;
 }
 
 export interface GenerateRequest {
   input: {
-    type: "sql" | "json-schema" | "auto";
+    type: "sql" | "prisma" | "drizzle" | "zod" | "openapi" | "json-schema" | "auto";
     files: Array<{ name: string; content: string }>;
   };
   output: {
@@ -82,14 +110,14 @@ export interface GenerateRequest {
     sql_dialect?: "postgres" | "mysql" | "sqlite";
   };
   options?: GenerateOptions;
+  /** Inline .dataseed.json — merged into options. */
+  config?: Partial<GenerateOptions> & { schema?: string };
 }
 
 export type Row = Record<string, unknown>;
 
 export interface GeneratedDataset {
-  /** Tables in topological order (parents first). */
   order: string[];
-  /** rows[tableName] = array of generated rows */
   rows: Record<string, Row[]>;
   schema: UnifiedSchema;
 }
@@ -99,4 +127,31 @@ export interface GenerationReport {
   perTable: Record<string, number>;
   durationMs: number;
   warnings: string[];
+  order: string[];
+  aiCalls: number;
+  domain?: string;
+  aiIssues?: string[];
+  /** Per-column-cluster image strategy used. */
+  assets?: Record<string, AssetStrategy>;
+  parser?: string;
+}
+
+/** A persona is a coherent identity shared across columns of a single row. */
+export interface Persona {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  email: string;
+  username: string;
+  phone: string;
+  avatarSeed: string;
+  country: string;
+  countryCode: string;
+  city: string;
+  zip: string;
+  language: string;
+  currency: string;
+  timezone: string;
+  gender: "male" | "female";
+  ageYears: number;
 }
