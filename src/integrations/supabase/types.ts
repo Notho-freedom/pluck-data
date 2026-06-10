@@ -92,6 +92,75 @@ export type Database = {
         }
         Relationships: []
       }
+      seed_presets: {
+        Row: {
+          config: Json
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          config: Json
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      seed_runs: {
+        Row: {
+          api_key_id: string | null
+          created_at: string
+          domain: string | null
+          duration_ms: number
+          format: string | null
+          id: string
+          output_url: string | null
+          rows_total: number
+          schema_hash: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          api_key_id?: string | null
+          created_at?: string
+          domain?: string | null
+          duration_ms?: number
+          format?: string | null
+          id?: string
+          output_url?: string | null
+          rows_total?: number
+          schema_hash?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          api_key_id?: string | null
+          created_at?: string
+          domain?: string | null
+          duration_ms?: number
+          format?: string | null
+          id?: string
+          output_url?: string | null
+          rows_total?: number
+          schema_hash?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       usage_logs: {
         Row: {
           ai_calls: number
