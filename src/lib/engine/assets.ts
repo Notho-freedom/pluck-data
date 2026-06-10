@@ -18,7 +18,7 @@ function tableKeyword(table: string): string {
     company: "office", brand: "office",
     place: "city", city: "city",
   };
-  return map[n] ?? n.replace(/[^a-z0-9]/g, "") || "abstract";
+  return map[n] ?? (n.replace(/[^a-z0-9]/g, "") || "abstract");
 }
 
 export function detectAssetColumn(col: Column): boolean {
