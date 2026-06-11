@@ -13,8 +13,9 @@ export const analyzeSchemaTool = defineTool({
   execute: async ({ files }) => {
     const format = detectFormat(files);
     const schema = parseSchema({ input: { type: "auto", files }, output: { format: "json" } });
-    return { format, tables: schema.tables, dialect: schema.dialect };
+    return JSON.stringify({ format, tables: schema.tables, dialect: schema.dialect }, null, 2);
   },
+
 });
 
 export const generateSeedTool = defineTool({
