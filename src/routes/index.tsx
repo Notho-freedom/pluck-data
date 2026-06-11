@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  ArrowRight, Check, Terminal, Database, Sparkles, Shield,
+  ArrowRight, Check, Terminal, Sparkles, Shield,
   Layers, Workflow, Boxes, Wand2, Cpu, Zap,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
