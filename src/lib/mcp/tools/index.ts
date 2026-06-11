@@ -34,6 +34,7 @@ export const generateSeedTool = defineTool({
       output: { format, mode: "single", sql_dialect: "postgres" },
       options: { rowsPerTable: { default: rows }, locale, seed },
     });
-    return { output: res.output.single, report: res.report };
+    return JSON.stringify({ output: res.output.single, report: res.report }, null, 2);
   },
+
 });
