@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/Navbar";
+import { MarketingNav } from "@/components/marketing/MarketingNav";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Magnetic } from "@/components/animations/Magnetic";
 import { AnimatedTerminal } from "@/components/animations/AnimatedTerminal";
@@ -59,7 +59,7 @@ INSERT INTO "Post" ("id","authorId","title","body") VALUES
 function Landing() {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <MarketingNav />
 
       {/* ───────── Hero ───────── */}
       <section className="relative overflow-hidden border-b border-border/40">

@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ProductRouteImport } from './routes/product'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PlaygroundRouteImport } from './routes/playground'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as ChangelogRouteImport } from './routes/changelog'
+import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiMcpRouteImport } from './routes/api/mcp'
+import { Route as AuthenticatedPresetsRouteImport } from './routes/_authenticated/presets'
 import { Route as AuthenticatedKeysRouteImport } from './routes/_authenticated/keys'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -30,6 +36,16 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductRoute = ProductRouteImport.update({
+  id: '/product',
+  path: '/product',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlaygroundRoute = PlaygroundRouteImport.update({
   id: '/playground',
   path: '/playground',
@@ -40,9 +56,24 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegrationsRoute = IntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentsRoute = AgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -58,6 +89,11 @@ const ApiMcpRoute = ApiMcpRouteImport.update({
   id: '/api/mcp',
   path: '/api/mcp',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPresetsRoute = AuthenticatedPresetsRouteImport.update({
+  id: '/presets',
+  path: '/presets',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedKeysRoute = AuthenticatedKeysRouteImport.update({
   id: '/keys',
@@ -102,13 +138,19 @@ const ApiPublicV1AnalyzeRoute = ApiPublicV1AnalyzeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agents': typeof AgentsRoute
+  '/changelog': typeof ChangelogRoute
   '/docs': typeof DocsRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/playground': typeof PlaygroundRoute
+  '/pricing': typeof PricingRoute
+  '/product': typeof ProductRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/keys': typeof AuthenticatedKeysRoute
+  '/presets': typeof AuthenticatedPresetsRoute
   '/api/mcp': typeof ApiMcpRoute
   '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
   '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
@@ -118,13 +160,19 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agents': typeof AgentsRoute
+  '/changelog': typeof ChangelogRoute
   '/docs': typeof DocsRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/playground': typeof PlaygroundRoute
+  '/pricing': typeof PricingRoute
+  '/product': typeof ProductRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/keys': typeof AuthenticatedKeysRoute
+  '/presets': typeof AuthenticatedPresetsRoute
   '/api/mcp': typeof ApiMcpRoute
   '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
   '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
@@ -136,13 +184,19 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/agents': typeof AgentsRoute
+  '/changelog': typeof ChangelogRoute
   '/docs': typeof DocsRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/playground': typeof PlaygroundRoute
+  '/pricing': typeof PricingRoute
+  '/product': typeof ProductRoute
   '/signup': typeof SignupRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/keys': typeof AuthenticatedKeysRoute
+  '/_authenticated/presets': typeof AuthenticatedPresetsRoute
   '/api/mcp': typeof ApiMcpRoute
   '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
   '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
@@ -154,13 +208,19 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/agents'
+    | '/changelog'
     | '/docs'
+    | '/integrations'
     | '/login'
     | '/playground'
+    | '/pricing'
+    | '/product'
     | '/signup'
     | '/dashboard'
     | '/history'
     | '/keys'
+    | '/presets'
     | '/api/mcp'
     | '/api/public/v1/analyze'
     | '/api/public/v1/formats'
@@ -170,13 +230,19 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/agents'
+    | '/changelog'
     | '/docs'
+    | '/integrations'
     | '/login'
     | '/playground'
+    | '/pricing'
+    | '/product'
     | '/signup'
     | '/dashboard'
     | '/history'
     | '/keys'
+    | '/presets'
     | '/api/mcp'
     | '/api/public/v1/analyze'
     | '/api/public/v1/formats'
@@ -187,13 +253,19 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/agents'
+    | '/changelog'
     | '/docs'
+    | '/integrations'
     | '/login'
     | '/playground'
+    | '/pricing'
+    | '/product'
     | '/signup'
     | '/_authenticated/dashboard'
     | '/_authenticated/history'
     | '/_authenticated/keys'
+    | '/_authenticated/presets'
     | '/api/mcp'
     | '/api/public/v1/analyze'
     | '/api/public/v1/formats'
@@ -205,9 +277,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AgentsRoute: typeof AgentsRoute
+  ChangelogRoute: typeof ChangelogRoute
   DocsRoute: typeof DocsRoute
+  IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
   PlaygroundRoute: typeof PlaygroundRoute
+  PricingRoute: typeof PricingRoute
+  ProductRoute: typeof ProductRoute
   SignupRoute: typeof SignupRoute
   ApiMcpRoute: typeof ApiMcpRoute
   ApiPublicV1AnalyzeRoute: typeof ApiPublicV1AnalyzeRoute
@@ -226,6 +303,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/product': {
+      id: '/product'
+      path: '/product'
+      fullPath: '/product'
+      preLoaderRoute: typeof ProductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/playground': {
       id: '/playground'
       path: '/playground'
@@ -240,11 +331,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/integrations': {
+      id: '/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof IntegrationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs': {
       id: '/docs'
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents': {
+      id: '/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AgentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -267,6 +379,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/mcp'
       preLoaderRoute: typeof ApiMcpRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/presets': {
+      id: '/_authenticated/presets'
+      path: '/presets'
+      fullPath: '/presets'
+      preLoaderRoute: typeof AuthenticatedPresetsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/keys': {
       id: '/_authenticated/keys'
@@ -331,12 +450,14 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedKeysRoute: typeof AuthenticatedKeysRoute
+  AuthenticatedPresetsRoute: typeof AuthenticatedPresetsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedKeysRoute: AuthenticatedKeysRoute,
+  AuthenticatedPresetsRoute: AuthenticatedPresetsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -346,9 +467,14 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AgentsRoute: AgentsRoute,
+  ChangelogRoute: ChangelogRoute,
   DocsRoute: DocsRoute,
+  IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
   PlaygroundRoute: PlaygroundRoute,
+  PricingRoute: PricingRoute,
+  ProductRoute: ProductRoute,
   SignupRoute: SignupRoute,
   ApiMcpRoute: ApiMcpRoute,
   ApiPublicV1AnalyzeRoute: ApiPublicV1AnalyzeRoute,
@@ -360,13 +486,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
