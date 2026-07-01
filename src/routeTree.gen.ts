@@ -21,6 +21,7 @@ import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiMcpRouteImport } from './routes/api/mcp'
+import { Route as AuthenticatedPresetsRouteImport } from './routes/_authenticated/presets'
 import { Route as AuthenticatedKeysRouteImport } from './routes/_authenticated/keys'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -89,6 +90,11 @@ const ApiMcpRoute = ApiMcpRouteImport.update({
   path: '/api/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPresetsRoute = AuthenticatedPresetsRouteImport.update({
+  id: '/presets',
+  path: '/presets',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedKeysRoute = AuthenticatedKeysRouteImport.update({
   id: '/keys',
   path: '/keys',
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/keys': typeof AuthenticatedKeysRoute
+  '/presets': typeof AuthenticatedPresetsRoute
   '/api/mcp': typeof ApiMcpRoute
   '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
   '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/keys': typeof AuthenticatedKeysRoute
+  '/presets': typeof AuthenticatedPresetsRoute
   '/api/mcp': typeof ApiMcpRoute
   '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
   '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/keys': typeof AuthenticatedKeysRoute
+  '/_authenticated/presets': typeof AuthenticatedPresetsRoute
   '/api/mcp': typeof ApiMcpRoute
   '/api/public/v1/analyze': typeof ApiPublicV1AnalyzeRoute
   '/api/public/v1/formats': typeof ApiPublicV1FormatsRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/keys'
+    | '/presets'
     | '/api/mcp'
     | '/api/public/v1/analyze'
     | '/api/public/v1/formats'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/keys'
+    | '/presets'
     | '/api/mcp'
     | '/api/public/v1/analyze'
     | '/api/public/v1/formats'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/history'
     | '/_authenticated/keys'
+    | '/_authenticated/presets'
     | '/api/mcp'
     | '/api/public/v1/analyze'
     | '/api/public/v1/formats'
@@ -368,6 +380,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMcpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/presets': {
+      id: '/_authenticated/presets'
+      path: '/presets'
+      fullPath: '/presets'
+      preLoaderRoute: typeof AuthenticatedPresetsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/keys': {
       id: '/_authenticated/keys'
       path: '/keys'
@@ -431,12 +450,14 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedKeysRoute: typeof AuthenticatedKeysRoute
+  AuthenticatedPresetsRoute: typeof AuthenticatedPresetsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedKeysRoute: AuthenticatedKeysRoute,
+  AuthenticatedPresetsRoute: AuthenticatedPresetsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
