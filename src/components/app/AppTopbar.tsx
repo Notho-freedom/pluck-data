@@ -11,7 +11,7 @@ const TITLES: Record<string, string> = {
 
 export function AppTopbar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const title = TITLES[pathname] ?? pathname.replace(/^\//, "").replace(/-/g, " ") || "Console";
+  const title = TITLES[pathname] ?? (pathname.replace(/^\//, "").replace(/-/g, " ") || "Console");
 
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border/60 bg-background/70 px-6 backdrop-blur-xl">
