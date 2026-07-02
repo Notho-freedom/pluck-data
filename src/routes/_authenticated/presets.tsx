@@ -41,10 +41,10 @@ function PresetsPage() {
             >
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary/90">
-                  #{String(i + 1).padStart(2, "0")} · {ex.category ?? "preset"}
+                  #{String(i + 1).padStart(2, "0")} · preset
                 </p>
                 <h3 className="mt-3 font-display text-[26px] leading-tight tracking-tight sm:text-[32px]">
-                  {ex.title}
+                  <span className="mr-2">{ex.icon}</span>{ex.label}
                 </h3>
                 <p className="mt-2 max-w-md text-[13px] text-muted-foreground">{ex.description}</p>
               </div>
