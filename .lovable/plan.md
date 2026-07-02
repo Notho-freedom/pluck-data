@@ -1,128 +1,75 @@
-# DataSeed — Refonte multi-pages public + refonte totale App
+## Objectif
 
-Trois chantiers : (1) éclater le site public en vrai site marketing multi-pages avec illustrations premium, (2) refondre l'app authentifiée avec un design mature type console d'infra, (3) finir les chantiers v3 restés ouverts (playground onglets, presets, insert UI, streaming, MCP finition).
-
----
-
-## 1. Site public multi-pages
-
-Aujourd'hui tout est empilé sur `/`. On éclate en pages dédiées, chacune avec ses métadonnées, ses illustrations et son angle produit.
-
-**Nouvelles routes**
-
-- `/` — Hero corporate resserré, promesse + preuve produit + CTA. Plus court, plus dense.
-- `/product` — Le moteur : parsers multi-formats, cohérence persona, domaines, types riches, assets. Zigzag illustré.
-- `/agents` — MCP + Cursor / Claude Code / Windsurf. Terminal animé, exemples de configs, tools exposés.
-- `/integrations` — Postgres, MySQL, SQLite, Supabase, Neon, Prisma, Drizzle, Zod, OpenAPI. Matrice + cartes.
-- `/docs` — refondue en sidebar gauche (Getting started / Schema formats / Assets / Direct insert / MCP / API reference / CLI).
-- `/pricing` — placeholder honnête (Free playground / Pro / Team) sans fake prix, juste la structure.
-- `/changelog` — page statique, entrées v3.0, v3.1…
-- `/company` — About / Security / Contact (single page condensée).
-
-**Navigation & chrome**
-
-- Navbar dense : Product · Agents · Integrations · Docs · Pricing · Changelog · [Login] [Open playground].
-- Footer corporate 4 colonnes conservé.
-- Bandeau logos-tech en bas de chaque page publique (déjà existant, généralisé).
-
-**Illustrations premium supplémentaires** (tier `premium`, style isométrique sombre cohérent avec l'existant, fondus via `<BlendedImage>`) :
-
-- `product-parsers.jpg`, `product-personas.jpg`, `product-assets.jpg`, `product-types.jpg`
-- `agents-mcp.jpg` (terminal + IDE stylisés), `agents-flow.jpg`
-- `integrations-matrix.jpg` (constellation de logos stylisés)
-- `docs-hero.jpg`
-- 1 illustration OG partagée par page (`og-*.jpg`) pour metadata sociales
-
-**SEO**
-
-- `head()` par route : title/description/og distincts, JSON-LD `SoftwareApplication` sur `/`, `TechArticle` sur `/docs/*`.
-- H1 unique par page, alt textes explicites, canonical.
+Refonte radicale de la console (sortir du template sidebar+topbar), coloration syntaxique partout, animation de flux sur la landing, et création de toutes les pages du footer manquantes. Une seule passe.
 
 ---
 
-## 2. Refonte totale de l'App (zone `_authenticated`)
+## 1. Console — casser le moule "sidebar + topbar + cartes"
 
-Objectif : passer du "dashboard SaaS générique" à une **console d'infrastructure de données** — inspiration Linear / Vercel / Neon console. Mature, dense mais respirable, zéro glow multicolore, zéro carte pastel.
+Abandon complet de `AppSidebar` / `AppTopbar` / `AppMobileNav` et des grilles de cartes bordées. Nouveau paradigme :
 
-**Design system app (extension `styles.css`)**
+**Command Deck** — layout unique, non-conventionnel :
+- Rail vertical ultra-fin à gauche (44px), sans labels, juste des glyphes monogrammes qui se déploient au hover en une lame flottante (pas un panneau fixe).
+- Pas de topbar. À la place, une **command bar** flottante centrée en haut (style Raycast/Linear ⌘K permanent) qui sert à la fois de fil d'Ariane, recherche, actions, et déconnexion (via ⌘K → "sign out", pas de bouton coin-droit).
+- Zone principale sans cartes. Les données sont posées sur le fond en **blocs typographiques** : gros chiffres en display serif (Instrument Serif), séparés par des filets fins et de l'espace, jamais dans des rectangles bordés.
+- Densité "journal financier" : colonnes de texte, tabulations mono, indicateurs inline (points colorés, deltas).
 
-- App shell dédié : fond `oklch(0.12 0.015 245)`, panneaux `oklch(0.16 0.015 245)`, séparateurs `1px oklch(0.22 …)`.
-- Densité 13–14px, mono JetBrains pour identifiants / IDs / connection strings, Instrument Serif réservé aux titres de page uniquement.
-- Accents : émeraude désaturé (actions), acier (secondaire), ambre pour warnings, rouge sobre pour destructive.
-- Composants console : `StatCard` sobre (nombre + delta + sparkline mono), `DataTable` dense zebra-less, `EmptyState` illustré, `CommandMenu` (Cmd-K), `Kbd` component.
+**Pages retravaillées dans ce langage :**
+- `dashboard` — hero chiffre du jour (requêtes, rows générées) en display serif géant, puis flux d'activité en liste type terminal log (timestamp mono + event), pas de widgets.
+- `keys` — table sans bordures, lignes séparées par filets. Génération de clé en overlay pleine largeur qui glisse depuis le haut.
+- `history` — timeline verticale (rail + points), chaque entrée dépliable inline avec le payload en syntax-highlighted.
+- `presets` — grille éditoriale magazine (tailles inégales), miniatures schéma en ASCII-art coloré, pas de cartes.
 
-**Layout app**
+**Comportement :**
+- Déconnexion : uniquement via command bar (⌘K → sign out) + item glyphe en bas du rail au survol. Jamais en coin.
+- Navigation active : soulignement animé sous le glyphe, pas de pastille de fond.
+- Zéro `Card` / `border rounded-xl` sur les pages console.
 
-- Sidebar gauche fixe 240px : logo compact, sections (Overview / Playground / Presets / History / API Keys / Docs) + user menu bas.
-- Topbar mince : breadcrumb, `⌘K`, environnement (Dev/Prod placeholder), avatar.
-- Page container max 1280px, padding généreux, transitions instant.
+## 2. Coloration syntaxique globale
 
-**Pages app refondues**
+Intégration `shikri`/`shiki` (thème custom aligné sur les tokens mint/noir) pour tous les blocs de code de l'app :
+- Composant `<Code lang="sql|ts|json|bash|python" />` unique.
+- Remplacement de tous les `<pre><code>` bruts : landing (hero terminal, exemples flow), `/docs`, `/product`, `/agents`, `/integrations`, `/changelog`, `/playground` (input schema + output), `/history` (payloads).
+- Thème custom : fond transparent, keywords mint, strings ambre doux, comments gris-bleu, numbers lavande — cohérent avec la palette existante.
 
-- `/dashboard` → **Overview** : dernières générations, quota API, presets récents, quickstart cards (Playground / Import schema / Connect DB / Install MCP). Vraie densité utile, pas de faux graphes.
-- `/playground` → **3 onglets** (Schéma source / Assets & cohérence / Cibles & export) — cf §3.1.
-- `/presets` (nouveau) — liste + CRUD sur `seed_presets`.
-- `/history` — enrichie, lit `seed_runs`, filtres format/date, re-download, re-run.
-- `/keys` — conservée, restylée console.
-- Ajout `⌘K` global (command menu) : nav rapide + actions (New generation, Copy MCP config, Open docs…).
+## 3. Landing — section "Flow" animée
 
-**Onboarding**
+Nouvelle section entre hero et features : **"Watch it think"**
+- 3 colonnes horizontales : `SCHEMA` → `ENGINE` → `OUTPUT`.
+- Flèche animée qui n'est pas une flèche : un **rail de particules** SVG qui pulse en continu, avec des tokens (nom de colonne, type) qui glissent le long du rail de gauche à droite, se transforment au passage dans l'"engine" (halo mint qui palpite), et atterrissent en lignes SQL colorées à droite.
+- L'engine central : bloc rond avec anneaux concentriques qui tournent (SVG), micro-labels orbitaux ("parse", "infer", "persona", "coherence") qui apparaissent en séquence.
+- Boucle infinie, ~6s par cycle, pause au hover.
+- Rebuild aussi le mini-terminal existant du hero pour utiliser Shiki (vraie coloration, pas des spans hardcodés).
 
-- Première visite `/dashboard` : checklist 4 étapes (Run first generation → Save preset → Connect DB → Install MCP), dismissible, persistée dans `seed_presets` ou localStorage.
+## 4. Pages footer à créer
 
----
+D'après le footer actuel, à créer (celles NON exclues par l'utilisateur) :
+- `/playground` ✅ existe
+- `/docs` ✅ existe
+- `/docs` (API reference) → route dédiée `/api-reference`
+- `/changelog` ✅ existe
+- `/mcp` — MCP server (page dédiée, distincte de `/agents`)
+- `/rest-api` — REST API endpoints détaillés
+- `/schema-formats` — formats supportés (SQL, Prisma, Drizzle, Zod, OpenAPI, JSON)
+- `/examples` — galerie schémas + résultats
+- `/about` — page société
+- `/customers` — logos + cas clients
 
-## 3. Finition v3 (intégrée)
+Exclus par demande utilisateur : Customers (déjà exclus? il a dit "à part Customer, Contact, Legal, Pricing, Sécurité, Status et Top"). **Interprétation :** on NE crée PAS : Customers, Contact, Legal, Pricing (existe déjà), Security, Status, Support. On crée : About, MCP server, REST API, Schema formats, Examples, API reference.
 
-Reprend les items non terminés du plan précédent :
+Toutes ces pages utilisent `PublicLayout` + le langage marketing existant (déjà validé). Code partout via Shiki.
 
-- **3.1 Playground onglets** : `AssetsEditor.tsx`, `TargetSelector.tsx`, `LivePreviewTable.tsx`, `PresetSelector.tsx`, sélecteur persona/locale, boutons copier `.dataseed.json` / CLI / MCP config.
-- **3.2 Presets** : route `_authenticated/presets.tsx` + hook CRUD sur `seed_presets`.
-- **3.3 Insert direct UI** : bouton "Insert into DB" appelant `/v1/insert`, validation regex des connection strings, affichage résultat.
-- **3.4 Streaming + history** : `/v1/generate` NDJSON si `rows > 5000`, `history.tsx` lit `seed_runs`.
-- **3.5 `.dataseed.json` loader** : `/v1/generate` accepte `config` complet, bouton "Import .dataseed.json" dans playground.
-- **3.6 MCP finition** : vérif `/api/mcp` SSE avec client minimal, doc install Cursor/Claude Code/Windsurf dans `/docs`, tools `insert_into_db` + `list_presets`.
+## 5. Détails techniques
 
----
+- `shiki` (v1, avec thème custom JSON généré depuis les CSS vars).
+- Nouveau `src/components/code/Code.tsx` (SSR-safe, async highlighter singleton).
+- Nouveau `src/components/console/CommandBar.tsx` + `Rail.tsx` + `ConsoleShell.tsx` remplaçant `AppSidebar`/`AppTopbar`/`AppMobileNav`.
+- Nouveau `src/components/landing/FlowSection.tsx` (SVG + Motion pour rail de particules).
+- Suppression de : `AppSidebar.tsx`, `AppTopbar.tsx`, `AppMobileNav.tsx`.
+- `_authenticated.tsx` : monte `ConsoleShell`.
+- Refonte `dashboard.tsx`, `keys.tsx`, `history.tsx`, `presets.tsx` — aucune `Card`, aucun `border rounded` sur les métriques.
+- Mise à jour footer pour pointer les nouvelles routes.
 
-## 4. Illustrations à générer (bilan total)
+## Livraison
 
-Premium tier, cohérentes avec les 6 existantes (isométrique sombre, émeraude/turquoise, halos doux). ~10 nouvelles :
-
-- 4 produit (parsers / personas / assets / types)
-- 2 agents (mcp / flow)
-- 1 integrations
-- 1 docs
-- 1 empty-state générique app
-- 1 hero secondaire pour `/pricing` ou `/company`
-
-Toutes exposées via `<BlendedImage>` existant.
-
----
-
-## 5. Tests bout-en-bout
-
-- `bun run build` → 0 erreur.
-- Toutes les nouvelles routes publiques : chargement, meta, pas de scroll horizontal, illustrations fondues correctement.
-- App : sidebar + topbar + `⌘K` fonctionnels, dashboard réel (pas de données mockées), playground 3 onglets opérationnels.
-- Playground : SQL 250 rows, Prisma, Zod, Drizzle, OpenAPI — 1 test chacun.
-- `/v1/analyze` + `/v1/generate` (NDJSON) + `/v1/insert` (mock) via fetch.
-- MCP : ping + `analyze_schema` + `generate_seed` + `list_presets`.
-- Presets save/load/delete, history read.
-- Captures desktop + mobile de chaque page publique et de l'app.
-
----
-
-## Ordre d'exécution
-
-1. Génération des ~10 illustrations en parallèle
-2. Extension design system (tokens app shell, sidebar, densité)
-3. AppShell + sidebar + topbar + `⌘K` + refonte Dashboard/History/Keys
-4. Playground 3 onglets + Presets + Insert UI + streaming
-5. Éclatement site public : nouvelles routes (`/product`, `/agents`, `/integrations`, `/pricing`, `/changelog`, `/company`) + refonte `/` resserrée + navbar/footer
-6. Refonte `/docs` en sidebar
-7. MCP finition + tools additionnels
-8. Tests bout-en-bout + captures
-9. publication npm SDK/CLI
-
-**Hors-scope** : Stripe réel, vidéos, PostGIS complexe, validation pglite.
+Une seule passe complète : shell console + refonte des 4 pages console + Shiki intégré partout + section flow landing + 6 nouvelles pages footer + nettoyage.
