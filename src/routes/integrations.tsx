@@ -7,36 +7,46 @@ import { BlendedImage } from "@/components/illustrations/BlendedImage";
 import matrix from "@/assets/illustrations/integrations-matrix.jpg";
 
 export const Route = createFileRoute("/integrations")({
-  head: () => ({ meta: [
-    { title: "Integrations — DataSeed" },
-    { name: "description", content: "DataSeed integrates with Postgres, Supabase, Neon, Prisma, Drizzle, Zod, OpenAPI, and MCP-compatible agents." },
-  ]}),
+  head: () => ({
+    meta: [
+      { title: "Integrations — DataSeed" },
+      {
+        name: "description",
+        content:
+          "DataSeed integrates with Postgres, Supabase, Neon, Prisma, Drizzle, Zod, OpenAPI, and MCP-compatible agents.",
+      },
+    ],
+  }),
   component: IntegrationsPage,
 });
 
-type IntegrationGroup = { title: string; icon: React.ReactNode; items: { name: string; note: string; status: "live" | "beta" }[] };
+type IntegrationGroup = {
+  title: string;
+  icon: React.ReactNode;
+  items: { name: string; note: string; status: "live" | "beta" }[];
+};
 
 const GROUPS: IntegrationGroup[] = [
   {
     title: "Databases",
     icon: <Database className="h-4 w-4" />,
     items: [
-      { name: "Postgres",  note: "Direct INSERT stream, topological ordering", status: "live" },
-      { name: "Supabase",  note: "REST + service key injection", status: "live" },
-      { name: "Neon",      note: "HTTP driver for edge workflows", status: "live" },
-      { name: "MySQL",     note: "SQL export, direct insert on roadmap", status: "beta" },
-      { name: "SQLite",    note: "SQL export for local prototyping", status: "live" },
+      { name: "Postgres", note: "Direct INSERT stream, topological ordering", status: "live" },
+      { name: "Supabase", note: "REST + service key injection", status: "live" },
+      { name: "Neon", note: "HTTP driver for edge workflows", status: "live" },
+      { name: "MySQL", note: "SQL export, direct insert on roadmap", status: "beta" },
+      { name: "SQLite", note: "SQL export for local prototyping", status: "live" },
     ],
   },
   {
     title: "Schema formats",
     icon: <Braces className="h-4 w-4" />,
     items: [
-      { name: "SQL DDL",  note: "CREATE TABLE, FKs, enums, CHECK", status: "live" },
-      { name: "Prisma",   note: "schema.prisma with relations", status: "live" },
-      { name: "Drizzle",  note: "pgTable, foreign keys, indexes", status: "live" },
-      { name: "Zod",      note: "z.object with refinements", status: "live" },
-      { name: "OpenAPI",  note: "3.0 / 3.1 component schemas", status: "live" },
+      { name: "SQL DDL", note: "CREATE TABLE, FKs, enums, CHECK", status: "live" },
+      { name: "Prisma", note: "schema.prisma with relations", status: "live" },
+      { name: "Drizzle", note: "pgTable, foreign keys, indexes", status: "live" },
+      { name: "Zod", note: "z.object with refinements", status: "live" },
+      { name: "OpenAPI", note: "3.0 / 3.1 component schemas", status: "live" },
       { name: "JSON Schema", note: "Draft 2020-12 subset", status: "beta" },
     ],
   },
@@ -44,18 +54,18 @@ const GROUPS: IntegrationGroup[] = [
     title: "Agents & runtimes",
     icon: <Terminal className="h-4 w-4" />,
     items: [
-      { name: "Cursor",       note: "MCP server via .cursor/mcp.json", status: "live" },
-      { name: "Claude Code",  note: "claude mcp add", status: "live" },
-      { name: "Windsurf",     note: "Native MCP support", status: "live" },
+      { name: "Cursor", note: "MCP server via .cursor/mcp.json", status: "live" },
+      { name: "Claude Code", note: "claude mcp add", status: "live" },
+      { name: "Windsurf", note: "Native MCP support", status: "live" },
       { name: "Cloudflare Workers", note: "Edge-friendly REST client", status: "live" },
-      { name: "Node & Deno",  note: "Any fetch-compatible runtime", status: "live" },
+      { name: "Node & Deno", note: "Any fetch-compatible runtime", status: "live" },
     ],
   },
   {
     title: "Delivery",
     icon: <Cloud className="h-4 w-4" />,
     items: [
-      { name: "REST",   note: "One JSON contract, every language", status: "live" },
+      { name: "REST", note: "One JSON contract, every language", status: "live" },
       { name: "NDJSON", note: "Streamed rows for million-row jobs", status: "live" },
       { name: "Webhook", note: "Push seeded runs to your service", status: "beta" },
     ],
@@ -72,7 +82,9 @@ function IntegrationsPage() {
         sub="No SDK to install. No custom binding to maintain. DataSeed exposes one JSON contract that fits every runtime, database and agent your team touches."
       >
         <Button asChild size="lg" className="shadow-glow">
-          <Link to="/docs">See integration guides <ArrowRight className="ml-1 h-4 w-4" /></Link>
+          <Link to="/docs">
+            See integration guides <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
         </Button>
         <Button asChild size="lg" variant="outline">
           <Link to="/agents">Set up as an MCP tool</Link>
@@ -82,7 +94,14 @@ function IntegrationsPage() {
       <section className="border-b border-border/40">
         <div className="mx-auto max-w-7xl px-6 py-20">
           <div className="illu-halo mx-auto max-w-3xl">
-            <BlendedImage src={matrix} alt="Integrations matrix" width={1600} height={1024} fade="all" glow={false} />
+            <BlendedImage
+              src={matrix}
+              alt="Integrations matrix"
+              width={1600}
+              height={1024}
+              fade="all"
+              glow={false}
+            />
           </div>
         </div>
       </section>
@@ -110,11 +129,13 @@ function IntegrationsPage() {
                         <div className="text-sm font-medium">{it.name}</div>
                         <div className="text-[12px] text-muted-foreground">{it.note}</div>
                       </div>
-                      <span className={
-                        it.status === "live"
-                          ? "rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary"
-                          : "rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-amber-400"
-                      }>
+                      <span
+                        className={
+                          it.status === "live"
+                            ? "rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary"
+                            : "rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-amber-400"
+                        }
+                      >
                         {it.status}
                       </span>
                     </li>
@@ -128,11 +149,15 @@ function IntegrationsPage() {
 
       <section className="border-b border-border/40 bg-[oklch(0.13_0.012_250)]/40">
         <div className="mx-auto max-w-6xl px-6 py-24">
-          <SectionHead align="left" eyebrow="Direct insert" title="Push straight into your database."
-            sub="Skip the download-then-import dance. Give DataSeed a connection URL — we handle topological ordering." />
+          <SectionHead
+            align="left"
+            eyebrow="Direct insert"
+            title="Push straight into your database."
+            sub="Skip the download-then-import dance. Give DataSeed a connection URL — we handle topological ordering."
+          />
           <div className="mt-10">
-            <TerminalCard title="insert.ts" badge="POST /v1/insert" lang="ts" accent>
-{`await fetch("https://api.dataseed.dev/v1/insert", {
+            <TerminalCard title="insert.ts" badge="POST /v1/insert" lang="typescript" accent>
+              {`await fetch("https://api.dataseed.dev/v1/insert", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",

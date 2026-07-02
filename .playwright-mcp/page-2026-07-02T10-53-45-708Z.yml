@@ -1,0 +1,184 @@
+- generic [active] [ref=f7e1]:
+  - generic [ref=f7e3]:
+    - banner [ref=f7e4]:
+      - generic [ref=f7e5]:
+        - generic [ref=f7e6]:
+          - link "DataSeed" [ref=f7e7] [cursor=pointer]:
+            - /url: /
+            - img [ref=f7e9]
+            - generic [ref=f7e13]: DataSeed
+          - navigation [ref=f7e14]:
+            - link "Product" [ref=f7e15] [cursor=pointer]:
+              - /url: /product
+            - link "Agents" [ref=f7e16] [cursor=pointer]:
+              - /url: /agents
+            - link "Integrations" [ref=f7e17] [cursor=pointer]:
+              - /url: /integrations
+            - link "Docs" [ref=f7e18] [cursor=pointer]:
+              - /url: /docs
+            - link "Pricing" [ref=f7e19] [cursor=pointer]:
+              - /url: /pricing
+            - link "Changelog" [ref=f7e20] [cursor=pointer]:
+              - /url: /changelog
+        - generic [ref=f7e21]:
+          - link "GitHub" [ref=f7e22] [cursor=pointer]:
+            - /url: https://github.com
+            - img [ref=f7e23]
+          - link "Sign in" [ref=f7e26] [cursor=pointer]:
+            - /url: /login
+          - link "Open playground" [ref=f7e27] [cursor=pointer]:
+            - /url: /playground
+    - main [ref=f7e28]:
+      - generic [ref=f7e30]:
+        - paragraph [ref=f7e31]: Examples
+        - heading "Start from a product shape, not a blank box." [level=1] [ref=f7e32]:
+          - text: Start from a product shape,
+          - text: not a blank box.
+        - paragraph [ref=f7e33]: Each sample can be opened directly in the workbench and generated as SQL, JSON, CSV, TypeScript, or Python.
+        - link "Open workbench" [ref=f7e35] [cursor=pointer]:
+          - /url: /playground
+          - text: Open workbench
+          - img
+      - generic [ref=f7e38]:
+        - article [ref=f7e39]:
+          - generic [ref=f7e40]:
+            - paragraph [ref=f7e41]: "01"
+            - heading "Chat app" [level=2] [ref=f7e42]
+            - paragraph [ref=f7e43]: Users, conversations, messages with realistic threads.
+            - link "run this schema" [ref=f7e44] [cursor=pointer]:
+              - /url: /playground?example=chat
+              - text: run this schema
+              - img [ref=f7e45]
+          - code [ref=f7e48]: CREATE TABLE users ( id UUID PRIMARY KEY, email VARCHAR(255) UNIQUE NOT NULL, full_name VARCHAR(100), avatar_url TEXT, created_at TIMESTAMP ); CREATE TABLE conversations ( id UUID PRIMARY KEY, title VARCHAR(120), created_at TIMESTAMP ); CREATE TABLE messages ( id UUID PRIMARY KEY, conversation_id UUID REFERENCES conversations(id), user_id UUID REFERENCES users(id), content TEXT, created_at TIMESTAMP );
+        - article [ref=f7e49]:
+          - generic [ref=f7e50]:
+            - paragraph [ref=f7e51]: "02"
+            - heading "E-commerce" [level=2] [ref=f7e52]
+            - paragraph [ref=f7e53]: Products, orders, customers — full FK chain.
+            - link "run this schema" [ref=f7e54] [cursor=pointer]:
+              - /url: /playground?example=ecommerce
+              - text: run this schema
+              - img [ref=f7e55]
+          - code [ref=f7e58]: CREATE TABLE customers ( id UUID PRIMARY KEY, email VARCHAR(255) UNIQUE, full_name VARCHAR(100), country VARCHAR(2), created_at TIMESTAMP ); CREATE TABLE products ( id UUID PRIMARY KEY, sku VARCHAR(40) UNIQUE, name VARCHAR(120), price DECIMAL(10,2), stock INT ); CREATE TABLE orders ( id UUID PRIMARY KEY, customer_id UUID REFERENCES customers(id), product_id UUID REFERENCES products(id), quantity INT, total DECIMAL(10,2), created_at TIMESTAMP );
+        - article [ref=f7e59]:
+          - generic [ref=f7e60]:
+            - paragraph [ref=f7e61]: "03"
+            - heading "SaaS billing" [level=2] [ref=f7e62]
+            - paragraph [ref=f7e63]: Accounts, subscriptions, invoices.
+            - link "run this schema" [ref=f7e64] [cursor=pointer]:
+              - /url: /playground?example=saas
+              - text: run this schema
+              - img [ref=f7e65]
+          - code [ref=f7e68]: CREATE TABLE accounts ( id UUID PRIMARY KEY, workspace_name VARCHAR(100), owner_email VARCHAR(255), plan VARCHAR(20), created_at TIMESTAMP ); CREATE TABLE subscriptions ( id UUID PRIMARY KEY, account_id UUID REFERENCES accounts(id), status VARCHAR(20), current_period_end TIMESTAMP, amount_cents INT ); CREATE TABLE invoices ( id UUID PRIMARY KEY, subscription_id UUID REFERENCES subscriptions(id), amount_cents INT, paid BOOLEAN, issued_at TIMESTAMP );
+        - article [ref=f7e69]:
+          - generic [ref=f7e70]:
+            - paragraph [ref=f7e71]: "04"
+            - heading "Blog CMS" [level=2] [ref=f7e72]
+            - paragraph [ref=f7e73]: Authors, posts, comments. Markdown-ready.
+            - link "run this schema" [ref=f7e74] [cursor=pointer]:
+              - /url: /playground?example=blog
+              - text: run this schema
+              - img [ref=f7e75]
+          - code [ref=f7e78]: CREATE TABLE authors ( id UUID PRIMARY KEY, email VARCHAR(255) UNIQUE, full_name VARCHAR(100), bio TEXT ); CREATE TABLE posts ( id UUID PRIMARY KEY, author_id UUID REFERENCES authors(id), title VARCHAR(200), slug VARCHAR(200) UNIQUE, content TEXT, published_at TIMESTAMP ); CREATE TABLE comments ( id UUID PRIMARY KEY, post_id UUID REFERENCES posts(id), author_email VARCHAR(255), content TEXT, created_at TIMESTAMP );
+        - article [ref=f7e79]:
+          - generic [ref=f7e80]:
+            - paragraph [ref=f7e81]: "05"
+            - heading "CRM" [level=2] [ref=f7e82]
+            - paragraph [ref=f7e83]: Companies, contacts, deals pipeline.
+            - link "run this schema" [ref=f7e84] [cursor=pointer]:
+              - /url: /playground?example=crm
+              - text: run this schema
+              - img [ref=f7e85]
+          - code [ref=f7e88]: CREATE TABLE companies ( id UUID PRIMARY KEY, name VARCHAR(120), domain VARCHAR(120), industry VARCHAR(60), size INT ); CREATE TABLE contacts ( id UUID PRIMARY KEY, company_id UUID REFERENCES companies(id), email VARCHAR(255), full_name VARCHAR(100), phone VARCHAR(30), title VARCHAR(80) ); CREATE TABLE deals ( id UUID PRIMARY KEY, company_id UUID REFERENCES companies(id), contact_id UUID REFERENCES contacts(id), stage VARCHAR(30), amount DECIMAL(12,2), expected_close TIMESTAMP );
+        - article [ref=f7e89]:
+          - generic [ref=f7e90]:
+            - paragraph [ref=f7e91]: "06"
+            - heading "Analytics events" [level=2] [ref=f7e92]
+            - paragraph [ref=f7e93]: Flat event stream — sessions and actions.
+            - link "run this schema" [ref=f7e94] [cursor=pointer]:
+              - /url: /playground?example=analytics
+              - text: run this schema
+              - img [ref=f7e95]
+          - code [ref=f7e98]: CREATE TABLE sessions ( id UUID PRIMARY KEY, user_id UUID, device VARCHAR(20), country VARCHAR(2), started_at TIMESTAMP ); CREATE TABLE events ( id UUID PRIMARY KEY, session_id UUID REFERENCES sessions(id), name VARCHAR(60), properties TEXT, occurred_at TIMESTAMP );
+    - contentinfo [ref=f7e99]:
+      - generic [ref=f7e100]:
+        - generic [ref=f7e101]:
+          - generic [ref=f7e102]:
+            - generic [ref=f7e103]:
+              - img [ref=f7e105]
+              - generic [ref=f7e109]: DataSeed
+            - paragraph [ref=f7e110]: The seed-data infrastructure for code agents and engineering teams who care about realism.
+            - generic [ref=f7e111]:
+              - link [ref=f7e112] [cursor=pointer]:
+                - /url: https://github.com
+                - img [ref=f7e113]
+              - link [ref=f7e116] [cursor=pointer]:
+                - /url: https://twitter.com
+                - img [ref=f7e117]
+          - generic [ref=f7e119]:
+            - heading "Product" [level=3] [ref=f7e120]
+            - list [ref=f7e121]:
+              - listitem [ref=f7e122]:
+                - link "Playground" [ref=f7e123] [cursor=pointer]:
+                  - /url: /playground
+              - listitem [ref=f7e124]:
+                - link "Documentation" [ref=f7e125] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=f7e126]:
+                - link "API reference" [ref=f7e127] [cursor=pointer]:
+                  - /url: /api-reference
+              - listitem [ref=f7e128]:
+                - link "Changelog" [ref=f7e129] [cursor=pointer]:
+                  - /url: /changelog
+          - generic [ref=f7e130]:
+            - heading "Developers" [level=3] [ref=f7e131]
+            - list [ref=f7e132]:
+              - listitem [ref=f7e133]:
+                - link "MCP server" [ref=f7e134] [cursor=pointer]:
+                  - /url: /mcp
+              - listitem [ref=f7e135]:
+                - link "REST API" [ref=f7e136] [cursor=pointer]:
+                  - /url: /rest-api
+              - listitem [ref=f7e137]:
+                - link "Schema formats" [ref=f7e138] [cursor=pointer]:
+                  - /url: /schema-formats
+              - listitem [ref=f7e139]:
+                - link "Examples" [ref=f7e140] [cursor=pointer]:
+                  - /url: /examples
+          - generic [ref=f7e141]:
+            - heading "Resources" [level=3] [ref=f7e142]
+            - list [ref=f7e143]:
+              - listitem [ref=f7e144]:
+                - link "Pricing" [ref=f7e145] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=f7e146]:
+                - link "Security" [ref=f7e147] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=f7e148]:
+                - link "Status" [ref=f7e149] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=f7e150]:
+                - link "Support" [ref=f7e151] [cursor=pointer]:
+                  - /url: /
+          - generic [ref=f7e152]:
+            - heading "Company" [level=3] [ref=f7e153]
+            - list [ref=f7e154]:
+              - listitem [ref=f7e155]:
+                - link "About" [ref=f7e156] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=f7e157]:
+                - link "Customers" [ref=f7e158] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=f7e159]:
+                - link "Contact" [ref=f7e160] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=f7e161]:
+                - link "Legal" [ref=f7e162] [cursor=pointer]:
+                  - /url: /
+        - generic [ref=f7e163]:
+          - generic [ref=f7e164]: © 2026 DataSeed. Built for engineers and agents.
+          - generic [ref=f7e165]:
+            - generic [ref=f7e166]: Privacy
+            - generic [ref=f7e167]: Terms
+            - generic [ref=f7e168]: SOC 2 (in progress)
+  - region "Notifications alt+T"

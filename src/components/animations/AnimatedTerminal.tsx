@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { Code } from "@/components/code/Code";
 
 interface AnimatedTerminalProps {
   inputTitle?: string;
@@ -11,8 +12,7 @@ interface AnimatedTerminalProps {
 }
 
 const reduced = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 export function AnimatedTerminal({
   inputTitle = "schema.sql",
@@ -69,10 +69,10 @@ export function AnimatedTerminal({
   return (
     <div className="grid gap-3 rounded-2xl border border-border/80 bg-card/60 p-3 shadow-elevated backdrop-blur-sm lg:grid-cols-[1fr_auto_1.15fr] lg:items-stretch">
       <Pane title={inputTitle} badge="INPUT" lang="sql">
-        <pre className="whitespace-pre-wrap break-words p-5 text-[12px] leading-relaxed font-mono text-foreground/90">
-          <code>{typed}</code>
+        <div className="relative p-5 text-[12px]">
+          <Code code={typed} lang="sql" wrap />
           {phase === "typing" && <span className="caret" />}
-        </pre>
+        </div>
       </Pane>
       <div className="hidden items-center justify-center lg:flex">
         <div
@@ -86,7 +86,7 @@ export function AnimatedTerminal({
         </div>
       </div>
       <Pane title={outputTitle} badge="OUTPUT" lang="sql" accent>
-        <pre className="whitespace-pre-wrap break-words p-5 text-[12px] leading-relaxed font-mono text-foreground/90 min-h-[220px]">
+        <div className="min-h-[220px] p-5 text-[12px]">
           {phase === "typing" && (
             <span className="text-muted-foreground/60">// awaiting input…</span>
           )}
@@ -97,19 +97,9 @@ export function AnimatedTerminal({
             </span>
           )}
           {phase === "out" && (
-            <code>
-              {outLines.map((l, i) => (
-                <div
-                  key={i}
-                  className="animate-fade-in"
-                  style={{ animationDelay: `${i * 30}ms`, animationFillMode: "backwards" }}
-                >
-                  {l || "\u00A0"}
-                </div>
-              ))}
-            </code>
+            <Code code={outLines.join("\n")} lang="sql" wrap className="animate-fade-in" />
           )}
-        </pre>
+        </div>
       </Pane>
     </div>
   );

@@ -1,0 +1,106 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e3]:
+    - complementary [ref=f1e4]:
+      - generic [ref=f1e5]:
+        - link "DataSeed" [ref=f1e6] [cursor=pointer]:
+          - /url: /
+        - navigation [ref=f1e7]:
+          - link "workbench" [ref=f1e8] [cursor=pointer]:
+            - /url: /playground
+          - link "console" [ref=f1e9] [cursor=pointer]:
+            - /url: /dashboard
+          - link "docs" [ref=f1e10] [cursor=pointer]:
+            - /url: /docs
+        - link "Sign in" [ref=f1e11] [cursor=pointer]:
+          - /url: /login
+          - img [ref=f1e12]
+    - main [ref=f1e15]:
+      - generic [ref=f1e17]:
+        - generic [ref=f1e18]:
+          - paragraph [ref=f1e19]: DataSeed workbench
+          - heading "Schema in. Coherent rows out." [level=1] [ref=f1e20]
+        - generic [ref=f1e21]:
+          - link "docs" [ref=f1e22] [cursor=pointer]:
+            - /url: /docs
+          - button "Generate" [ref=f1e23] [cursor=pointer]:
+            - img
+            - text: Generate
+      - generic [ref=f1e24]:
+        - generic [ref=f1e26]:
+          - generic [ref=f1e27]:
+            - generic [ref=f1e28]: schema.sql
+            - generic [ref=f1e29]: sql
+          - generic [ref=f1e30]:
+            - generic:
+              - code: CREATE TABLE users ( id UUID PRIMARY KEY, email VARCHAR(255) UNIQUE NOT NULL, full_name VARCHAR(100), created_at TIMESTAMP ); CREATE TABLE messages ( id UUID PRIMARY KEY, user_id UUID REFERENCES users(id), content TEXT, created_at TIMESTAMP );
+            - textbox "schema.sql" [ref=f1e31]:
+              - /placeholder: CREATE TABLE users (...);
+              - text: CREATE TABLE users ( id UUID PRIMARY KEY, email VARCHAR(255) UNIQUE NOT NULL, full_name VARCHAR(100), created_at TIMESTAMP ); CREATE TABLE messages ( id UUID PRIMARY KEY, user_id UUID REFERENCES users(id), content TEXT, created_at TIMESTAMP );
+        - complementary [ref=f1e32]:
+          - generic [ref=f1e33]:
+            - generic [ref=f1e34]:
+              - heading "Output" [level=2] [ref=f1e35]
+              - generic [ref=f1e36]:
+                - combobox [ref=f1e37] [cursor=pointer]:
+                  - img [ref=f1e38]
+                - combobox [ref=f1e40]
+                - combobox [ref=f1e41] [cursor=pointer]:
+                  - img [ref=f1e42]
+                - combobox [ref=f1e44]
+            - generic [ref=f1e45]:
+              - heading "Generation" [level=2] [ref=f1e46]
+              - generic [ref=f1e47]:
+                - generic [ref=f1e48]:
+                  - generic [ref=f1e49]: Root rows
+                  - spinbutton "Root rows" [ref=f1e50]: "10"
+                - combobox [ref=f1e51] [cursor=pointer]:
+                  - img [ref=f1e52]
+                - combobox [ref=f1e54]
+                - combobox [ref=f1e55] [cursor=pointer]:
+                  - img [ref=f1e56]
+                - combobox [ref=f1e58]
+            - generic [ref=f1e59]:
+              - heading "Read" [level=2] [ref=f1e60]
+              - generic [ref=f1e61]:
+                - generic [ref=f1e62]:
+                  - generic [ref=f1e63]: Tables
+                  - generic [ref=f1e64]: "?"
+                - generic [ref=f1e65]:
+                  - generic [ref=f1e66]: FK edges
+                  - generic [ref=f1e67]: "1"
+                - generic [ref=f1e68]:
+                  - generic [ref=f1e69]: Seed
+                  - generic [ref=f1e70]: "42"
+            - generic [ref=f1e72]:
+              - heading "Starts" [level=2] [ref=f1e73]
+              - generic [ref=f1e75]:
+                - button "01Chat app" [ref=f1e76]
+                - button "02E-commerce" [ref=f1e77]
+                - button "03SaaS billing" [ref=f1e78]
+                - button "04Blog CMS" [ref=f1e79]
+                - button "05CRM" [ref=f1e80]
+                - button "06Analytics events" [ref=f1e81]
+        - generic [ref=f1e82]:
+          - generic [ref=f1e83]:
+            - generic [ref=f1e84]: seed.sql
+            - generic [ref=f1e85]:
+              - button "Copy output" [disabled] [ref=f1e86]:
+                - img [ref=f1e87]
+              - button "Download output" [disabled] [ref=f1e90]:
+                - img [ref=f1e91]
+          - generic [ref=f1e96]:
+            - img [ref=f1e97]
+            - paragraph [ref=f1e100]: Waiting for a run
+            - paragraph [ref=f1e101]: Generate once and the output keeps syntax color, copy, and download ready.
+      - generic [ref=f1e102]:
+        - generic [ref=f1e103]:
+          - paragraph [ref=f1e104]: Request shape
+          - code [ref=f1e106]: "{ \"input\": { \"type\": \"auto\", \"files\": [ { \"name\": \"schema.sql\", \"content\": \"CREATE TABLE users (\\n id UUID PRIMARY KEY,\\n email VARCHAR(255) UNIQUE NOT NULL,\\n full_name VARCHAR(100),\\n created_at...\" } ] }, \"output\": { \"format\": \"sql\", \"mode\": \"single\", \"sql_dialect\": \"postgres\" }, \"options\": { \"rowsPerTable\": { \"default\": 10 }, \"seed\": 42, \"locale\": \"fr\", \"ai_enrichment\": \"off\" } }"
+        - generic [ref=f1e107]:
+          - generic [ref=f1e108]:
+            - paragraph [ref=f1e109]: Run report
+            - button "clear" [ref=f1e110]:
+              - img [ref=f1e111]
+              - text: clear
+          - paragraph [ref=f1e114]: No telemetry yet. Run generation to see rows, latency, AI calls, and inferred domain.
+  - region "Notifications alt+T"

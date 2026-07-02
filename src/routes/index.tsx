@@ -1,17 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  ArrowRight, Check, Terminal, Sparkles, Shield,
-  Layers, Workflow, Boxes, Wand2, Cpu, Zap,
+  ArrowRight,
+  Check,
+  Terminal,
+  Sparkles,
+  Shield,
+  Layers,
+  Workflow,
+  Boxes,
+  Wand2,
+  Cpu,
+  Zap,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { MarketingNav } from "@/components/marketing/MarketingNav";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Magnetic } from "@/components/animations/Magnetic";
-import { AnimatedTerminal } from "@/components/animations/AnimatedTerminal";
 import { BlendedImage } from "@/components/illustrations/BlendedImage";
 import { LogosBar } from "@/components/landing/LogosBar";
 import { CorporateFooter } from "@/components/landing/CorporateFooter";
+import { Code, type CodeLang } from "@/components/code/Code";
 
 import heroIllu from "@/assets/illustrations/hero-product.jpg";
 import solvesSchema from "@/assets/illustrations/solves-schema.jpg";
@@ -24,7 +33,11 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "DataSeed — Seed-data infrastructure for code agents" },
-      { name: "description", content: "Turn any schema (SQL, Prisma, Drizzle, Zod, OpenAPI) into coherent, FK-safe demo data with realistic personas, images, and direct database injection. MCP-native." },
+      {
+        name: "description",
+        content:
+          "Turn any schema (SQL, Prisma, Drizzle, Zod, OpenAPI) into coherent, FK-safe demo data with realistic personas, images, and direct database injection. MCP-native.",
+      },
     ],
   }),
   component: Landing,
@@ -86,18 +99,24 @@ function Landing() {
               </h1>
 
               <p className="mt-7 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-[17px]">
-                Give us a schema in any format. We return coherent, foreign-key safe, persona-consistent demo data — with avatars, locales, domain logic — ready to download, stream, or inject straight into your Postgres.
+                Give us a schema in any format. We return coherent, foreign-key safe,
+                persona-consistent demo data — with avatars, locales, domain logic — ready to
+                download, stream, or inject straight into your Postgres.
               </p>
 
               <div className="mt-9 flex flex-wrap items-center gap-3">
                 <Magnetic>
                   <Button asChild size="lg" className="shadow-glow">
-                    <Link to="/playground">Open the playground <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                    <Link to="/playground">
+                      Open the playground <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
                   </Button>
                 </Magnetic>
                 <Magnetic>
                   <Button asChild variant="outline" size="lg">
-                    <Link to="/docs"><Terminal className="mr-1 h-4 w-4" /> Read the docs</Link>
+                    <Link to="/docs">
+                      <Terminal className="mr-1 h-4 w-4" /> Read the docs
+                    </Link>
                   </Button>
                 </Magnetic>
               </div>
@@ -122,12 +141,9 @@ function Landing() {
             </div>
           </div>
 
-          {/* Schema → Data animated terminal */}
+          {/* Schema → Data flow */}
           <ScrollReveal delay={120}>
-            <div className="relative mx-auto mt-20 max-w-6xl">
-              <div className="absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-tr from-primary/10 via-transparent to-primary/5 opacity-60 blur-2xl" />
-              <AnimatedTerminal input={SAMPLE_IN} output={SAMPLE_OUT} />
-            </div>
+            <DataFlowSection />
           </ScrollReveal>
         </div>
       </section>
@@ -189,13 +205,18 @@ function Landing() {
             </div>
             <div className="order-1 lg:order-2 space-y-6">
               <Capability icon={<Layers className="h-5 w-5" />} title="Multi-format schema parsing">
-                Same engine reads <code>schema.prisma</code>, <code>pgTable()</code> from Drizzle, <code>z.object()</code>, OpenAPI 3, and raw <code>CREATE TABLE</code>. Format auto-detected on upload.
+                Same engine reads <code>schema.prisma</code>, <code>pgTable()</code> from Drizzle,{" "}
+                <code>z.object()</code>, OpenAPI 3, and raw <code>CREATE TABLE</code>. Format
+                auto-detected on upload.
               </Capability>
               <Capability icon={<Wand2 className="h-5 w-5" />} title="Rich Postgres types">
-                <code>vector(1536)</code> for pgvector, <code>geo-point</code> for PostGIS, <code>jsonb</code>, <code>inet</code>, <code>bytea</code>, <code>interval</code>, custom enums.
+                <code>vector(1536)</code> for pgvector, <code>geo-point</code> for PostGIS,{" "}
+                <code>jsonb</code>, <code>inet</code>, <code>bytea</code>, <code>interval</code>,
+                custom enums.
               </Capability>
               <Capability icon={<Boxes className="h-5 w-5" />} title="Domain awareness">
-                Healthcare → real ICD-10 specialties. E-commerce → realistic SKUs and price points. Finance → valid IBAN/SWIFT. CRM → coherent companies and contacts.
+                Healthcare → real ICD-10 specialties. E-commerce → realistic SKUs and price points.
+                Finance → valid IBAN/SWIFT. CRM → coherent companies and contacts.
               </Capability>
               <Capability icon={<Sparkles className="h-5 w-5" />} title="Deterministic by seed">
                 Same input + same seed = same dataset. Bit-for-bit reproducible CI fixtures.
@@ -226,8 +247,8 @@ function Landing() {
               />
             </div>
             <div>
-              <TerminalCard title="claude mcp add" badge="MCP">
-{`# Add DataSeed to Claude Code
+              <TerminalCard title="claude mcp add" badge="MCP" lang="bash">
+                {`# Add DataSeed to Claude Code
 claude mcp add dataseed \\
   --url https://api.dataseed.dev/api/mcp \\
   --api-key ds_live_...
@@ -274,7 +295,9 @@ claude mcp add dataseed \\
               </ul>
               <div className="mt-9 flex gap-3">
                 <Button asChild>
-                  <Link to="/playground">Try it live <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                  <Link to="/playground">
+                    Try it live <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
                 </Button>
                 <Button asChild variant="outline">
                   <Link to="/docs">View the docs</Link>
@@ -283,7 +306,7 @@ claude mcp add dataseed \\
             </div>
 
             <TerminalCard title="seed.ts" badge="REQUEST" lang="ts" accent>
-{`import { readFileSync } from "fs";
+              {`import { readFileSync } from "fs";
 
 const schema = readFileSync("schema.prisma", "utf8");
 
@@ -315,14 +338,26 @@ console.log(\`✓ \${report.totalRows} rows in \${report.durationMs}ms\`);`}
       <section className="border-b border-border/40">
         <div className="mx-auto max-w-7xl px-6 py-20">
           <div className="grid gap-12 md:grid-cols-4">
-            <TrustItem icon={<Shield className="h-5 w-5" />} title="SHA-256 keys"
-              body="Hashed at rest, scoped per workspace, rotatable, audit-logged." />
-            <TrustItem icon={<Cpu className="h-5 w-5" />} title="Edge runtime"
-              body="Sub-100ms cold start. Streams over HTTP for million-row jobs." />
-            <TrustItem icon={<Workflow className="h-5 w-5" />} title="Topological inserts"
-              body="Parents first, children second. Zero orphan rows, ever." />
-            <TrustItem icon={<Zap className="h-5 w-5" />} title="Quota & rate-limit"
-              body="Per-key budgets, per-minute caps, monthly counters." />
+            <TrustItem
+              icon={<Shield className="h-5 w-5" />}
+              title="SHA-256 keys"
+              body="Hashed at rest, scoped per workspace, rotatable, audit-logged."
+            />
+            <TrustItem
+              icon={<Cpu className="h-5 w-5" />}
+              title="Edge runtime"
+              body="Sub-100ms cold start. Streams over HTTP for million-row jobs."
+            />
+            <TrustItem
+              icon={<Workflow className="h-5 w-5" />}
+              title="Topological inserts"
+              body="Parents first, children second. Zero orphan rows, ever."
+            />
+            <TrustItem
+              icon={<Zap className="h-5 w-5" />}
+              title="Quota & rate-limit"
+              body="Per-key budgets, per-minute caps, monthly counters."
+            />
           </div>
         </div>
       </section>
@@ -337,12 +372,15 @@ console.log(\`✓ \${report.totalRows} rows in \${report.durationMs}ms\`);`}
               <span className="font-display italic text-primary">Ship realistic demos.</span>
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
-              30 seconds to a free key. Two minutes to your first 10,000 rows. A whole afternoon back to building actual features.
+              30 seconds to a free key. Two minutes to your first 10,000 rows. A whole afternoon
+              back to building actual features.
             </p>
             <div className="mt-9 flex flex-wrap justify-center gap-3">
               <Magnetic>
                 <Button asChild size="lg" className="shadow-glow">
-                  <Link to="/signup">Create your free account <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                  <Link to="/signup">
+                    Create your free account <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
                 </Button>
               </Magnetic>
               <Magnetic>
@@ -372,22 +410,44 @@ function Bullet({ children }: { children: React.ReactNode }) {
 }
 
 function SectionHead({
-  eyebrow, title, sub, align = "center",
-}: { eyebrow: string; title: string; sub?: string; align?: "left" | "center" }) {
+  eyebrow,
+  title,
+  sub,
+  align = "center",
+}: {
+  eyebrow: string;
+  title: string;
+  sub?: string;
+  align?: "left" | "center";
+}) {
   return (
     <div className={align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
       <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary/90">{eyebrow}</p>
       <h2 className="mt-4 text-balance text-3xl font-semibold tracking-tight sm:text-[40px] sm:leading-[1.1]">
         {title}
       </h2>
-      {sub && <p className={`mt-4 text-[15px] leading-relaxed text-muted-foreground ${align === "center" ? "mx-auto max-w-xl" : ""}`}>{sub}</p>}
+      {sub && (
+        <p
+          className={`mt-4 text-[15px] leading-relaxed text-muted-foreground ${align === "center" ? "mx-auto max-w-xl" : ""}`}
+        >
+          {sub}
+        </p>
+      )}
     </div>
   );
 }
 
 function SolveCard({
-  illustration, title, body, tags,
-}: { illustration: string; title: string; body: string; tags: string[] }) {
+  illustration,
+  title,
+  body,
+  tags,
+}: {
+  illustration: string;
+  title: string;
+  body: string;
+  tags: string[];
+}) {
   return (
     <div className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/40 p-7 transition-all hover:border-primary/30">
       <div className="-mx-7 -mt-7 mb-6 aspect-[4/3] overflow-hidden border-b border-border/40 bg-[oklch(0.11_0.01_250)]">
@@ -402,7 +462,10 @@ function SolveCard({
       <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
       <div className="mt-5 flex flex-wrap gap-1.5">
         {tags.map((t) => (
-          <span key={t} className="rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 font-mono text-[10.5px] text-muted-foreground">
+          <span
+            key={t}
+            className="rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 font-mono text-[10.5px] text-muted-foreground"
+          >
             {t}
           </span>
         ))}
@@ -411,7 +474,15 @@ function SolveCard({
   );
 }
 
-function Capability({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+function Capability({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex gap-4">
       <div className="mt-1 grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
@@ -429,7 +500,81 @@ function AgentBadge({ label }: { label: string }) {
   return (
     <div className="grid place-items-center rounded-lg border border-border/60 bg-card/40 px-3 py-3 text-center">
       <span className="text-sm font-medium">{label}</span>
-      <span className="mt-1 font-mono text-[10px] uppercase tracking-wider text-primary/80">supported</span>
+      <span className="mt-1 font-mono text-[10px] uppercase tracking-wider text-primary/80">
+        supported
+      </span>
+    </div>
+  );
+}
+
+function DataFlowSection() {
+  const steps = [
+    { id: "01", label: "parse", detail: "tables, columns, constraints" },
+    { id: "02", label: "graph", detail: "foreign-key order" },
+    { id: "03", label: "persona", detail: "locale and domain memory" },
+    { id: "04", label: "emit", detail: "SQL, JSON, CSV, TS, Python" },
+  ];
+
+  return (
+    <div className="relative mx-auto mt-20 max-w-6xl overflow-hidden border-y border-border/50 bg-[oklch(0.105_0.012_250)]">
+      <div className="grid lg:grid-cols-[1fr_0.8fr_1fr]">
+        <div className="min-w-0 p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              schema.prisma
+            </span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-primary/80">
+              input
+            </span>
+          </div>
+          <Code
+            code={SAMPLE_IN}
+            lang="prisma"
+            className="max-h-[360px] overflow-hidden text-[12px]"
+          />
+        </div>
+
+        <div className="relative border-y border-border/40 p-5 lg:border-x lg:border-y-0">
+          <div className="absolute left-0 right-0 top-1/2 h-px bg-border/50">
+            <span className="absolute top-1/2 h-[2px] w-24 -translate-y-1/2 bg-primary/80 animate-data-flow" />
+          </div>
+          <div className="relative grid h-full min-h-[320px] content-center gap-5">
+            {steps.map((step, index) => (
+              <div
+                key={step.id}
+                className="grid grid-cols-[42px_1fr] items-baseline gap-3 animate-flow-step"
+                style={{ animationDelay: `${index * 450}ms` }}
+              >
+                <span className="font-display text-[34px] leading-none text-primary/90">
+                  {step.id}
+                </span>
+                <div className="border-b border-border/35 pb-3">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-foreground">
+                    {step.label}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{step.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="min-w-0 p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              seed.sql
+            </span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-primary/80">
+              output
+            </span>
+          </div>
+          <Code
+            code={SAMPLE_OUT}
+            lang="sql"
+            className="max-h-[360px] overflow-hidden text-[12px]"
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -447,27 +592,39 @@ function TrustItem({ icon, title, body }: { icon: React.ReactNode; title: string
 }
 
 function TerminalCard({
-  title, badge, lang, children, accent,
-}: { title: string; badge: string; lang?: string; children: React.ReactNode; accent?: boolean }) {
+  title,
+  badge,
+  lang,
+  children,
+  accent,
+}: {
+  title: string;
+  badge: string;
+  lang?: CodeLang;
+  children: string;
+  accent?: boolean;
+}) {
   return (
-    <div className={`relative overflow-hidden rounded-xl border bg-[oklch(0.115_0.015_250)] ${accent ? "border-primary/30 shadow-glow" : "border-border/60"}`}>
-      <div className="flex items-center justify-between border-b border-border/60 bg-card/60 px-3.5 py-2">
+    <div
+      className={`relative overflow-hidden border-y border-border/50 bg-[oklch(0.115_0.015_250)] ${accent ? "shadow-glow" : ""}`}
+    >
+      <div className="flex items-center justify-between border-b border-border/40 px-3.5 py-2">
         <div className="flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.6_0.18_25)]/70" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.75_0.15_75)]/70" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.7_0.16_150)]/70" />
-          </div>
-          <span className="ml-2 font-mono text-[11px] text-muted-foreground">{title}</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          <span className="font-mono text-[11px] text-muted-foreground">{title}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`rounded-md border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider ${accent ? "border-primary/30 bg-primary/10 text-primary" : "border-border bg-muted text-muted-foreground"}`}>{badge}</span>
-          {lang && <span className="font-mono text-[10px] uppercase text-muted-foreground/70">{lang}</span>}
+          <span
+            className={`font-mono text-[10px] uppercase tracking-wider ${accent ? "text-primary" : "text-muted-foreground"}`}
+          >
+            {badge}
+          </span>
+          {lang && (
+            <span className="font-mono text-[10px] uppercase text-muted-foreground/70">{lang}</span>
+          )}
         </div>
       </div>
-      <pre className="overflow-x-auto whitespace-pre-wrap break-words p-5 text-[12.5px] leading-relaxed font-mono text-foreground/90">
-        <code>{children}</code>
-      </pre>
+      <Code code={children} lang={lang ?? "text"} wrap className="p-5" />
     </div>
   );
 }

@@ -1,0 +1,349 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link "DataSeed" [ref=e7] [cursor=pointer]:
+            - /url: /
+            - img [ref=e9]
+            - generic [ref=e13]: DataSeed
+          - navigation [ref=e14]:
+            - link "Product" [ref=e15] [cursor=pointer]:
+              - /url: /product
+            - link "Agents" [ref=e16] [cursor=pointer]:
+              - /url: /agents
+            - link "Integrations" [ref=e17] [cursor=pointer]:
+              - /url: /integrations
+            - link "Docs" [ref=e18] [cursor=pointer]:
+              - /url: /docs
+            - link "Pricing" [ref=e19] [cursor=pointer]:
+              - /url: /pricing
+            - link "Changelog" [ref=e20] [cursor=pointer]:
+              - /url: /changelog
+        - generic [ref=e21]:
+          - link "GitHub" [ref=e22] [cursor=pointer]:
+            - /url: https://github.com
+            - img [ref=e23]
+          - link "Sign in" [ref=e26] [cursor=pointer]:
+            - /url: /login
+          - link "Open playground" [ref=e27] [cursor=pointer]:
+            - /url: /playground
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e32]: v1 API · MCP-native · Lovable Cloud
+          - heading "The seed-data infrastructure for code agents." [level=1] [ref=e36]:
+            - text: The seed-data
+            - text: infrastructure
+            - text: for code agents.
+          - paragraph [ref=e37]: Give us a schema in any format. We return coherent, foreign-key safe, persona-consistent demo data — with avatars, locales, domain logic — ready to download, stream, or inject straight into your Postgres.
+          - generic [ref=e38]:
+            - link "Open the playground" [ref=e41] [cursor=pointer]:
+              - /url: /playground
+              - text: Open the playground
+              - img
+            - link "Read the docs" [ref=e44] [cursor=pointer]:
+              - /url: /docs
+              - img
+              - text: Read the docs
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - img [ref=e47]
+              - text: Free tier — 10k rows / month
+            - generic [ref=e49]:
+              - img [ref=e50]
+              - text: No credit card
+            - generic [ref=e52]:
+              - img [ref=e53]
+              - text: SOC 2 in progress
+        - img "DataSeed schema-to-data pipeline illustration" [ref=e57]
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]: schema.prisma
+            - generic [ref=e64]: input
+          - code [ref=e66]: "model User { id String @id @default(uuid()) email String @unique fullName String country String createdAt DateTime @default(now()) posts Post[] } model Post { id String @id @default(uuid()) authorId String author User @relation(fields: [authorId], references: [id]) title String body String }"
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]: "01"
+            - generic [ref=e73]:
+              - paragraph [ref=e74]: parse
+              - paragraph [ref=e75]: tables, columns, constraints
+          - generic [ref=e76]:
+            - generic [ref=e77]: "02"
+            - generic [ref=e78]:
+              - paragraph [ref=e79]: graph
+              - paragraph [ref=e80]: foreign-key order
+          - generic [ref=e81]:
+            - generic [ref=e82]: "03"
+            - generic [ref=e83]:
+              - paragraph [ref=e84]: persona
+              - paragraph [ref=e85]: locale and domain memory
+          - generic [ref=e86]:
+            - generic [ref=e87]: "04"
+            - generic [ref=e88]:
+              - paragraph [ref=e89]: emit
+              - paragraph [ref=e90]: SQL, JSON, CSV, TS, Python
+        - generic [ref=e91]:
+          - generic [ref=e92]:
+            - generic [ref=e93]: seed.sql
+            - generic [ref=e94]: output
+          - code [ref=e96]: INSERT INTO "User" ("id","email","fullName","country","createdAt") VALUES ('a1…','lea.martin@proton.me','Léa Martin','FR','2025-02-14 09:21:03'), ('c3…','paul.dupont@gmail.com','Paul Dupont','FR','2025-03-02 18:42:11'), ('e5…','maya.bernard@outlook.com','Maya Bernard','FR','2025-03-19 07:48:55'); INSERT INTO "Post" ("id","authorId","title","body") VALUES ('p1…','a1…','Lancement V2','Très fière de partager…'), ('p2…','c3…','Retour conférence','Trois jours intenses…');
+    - generic [ref=e98]:
+      - paragraph [ref=e99]: Built to plug into the stack your team already runs
+      - generic [ref=e100]:
+        - generic [ref=e101]: Postgres
+        - generic [ref=e102]: MySQL
+        - generic [ref=e103]: SQLite
+        - generic [ref=e104]: Prisma
+        - generic [ref=e105]: Drizzle
+        - generic [ref=e106]: Supabase
+        - generic [ref=e107]: Neon
+        - generic [ref=e108]: Cursor
+        - generic [ref=e109]: Claude
+        - generic [ref=e110]: Cloudflare
+    - generic [ref=e112]:
+      - generic [ref=e113]:
+        - paragraph [ref=e114]: What it solves
+        - heading "Three problems every engineering team hits." [level=2] [ref=e115]
+        - paragraph [ref=e116]: Faker breaks foreign keys. ChatGPT hallucinates constraints. Mockaroo has no API for agents. DataSeed fixes all three.
+      - generic [ref=e117]:
+        - generic [ref=e118]:
+          - heading "Any schema, parsed natively" [level=3] [ref=e120]
+          - paragraph [ref=e121]: SQL DDL, Prisma, Drizzle, Zod, OpenAPI, JSON Schema. Auto-detected. Tables, columns, FKs, enums, and CHECK constraints — all respected.
+          - generic [ref=e122]:
+            - generic [ref=e123]: SQL
+            - generic [ref=e124]: Prisma
+            - generic [ref=e125]: Drizzle
+            - generic [ref=e126]: Zod
+            - generic [ref=e127]: OpenAPI
+        - generic [ref=e128]:
+          - heading "Personas, not noise" [level=3] [ref=e130]
+          - paragraph [ref=e131]: "Each row is a coherent human: a French user gets a +33 number, a Paris zip, a fr-FR avatar. Cross-column consistency for country, language, currency, timezone."
+          - generic [ref=e132]:
+            - generic [ref=e133]: i18n
+            - generic [ref=e134]: Avatars
+            - generic [ref=e135]: Locale-aware
+        - generic [ref=e136]:
+          - heading "Download or inject directly" [level=3] [ref=e138]
+          - paragraph [ref=e139]: Get SQL, JSON, CSV, TypeScript, Python — or push straight into Supabase, Neon, Postgres with topological ordering. Your connection string never persists.
+          - generic [ref=e140]:
+            - generic [ref=e141]: Postgres
+            - generic [ref=e142]: Supabase
+            - generic [ref=e143]: Neon
+    - generic [ref=e145]:
+      - generic [ref=e146]:
+        - paragraph [ref=e147]: Built-in intelligence
+        - heading "The data understands its own domain." [level=2] [ref=e148]
+        - paragraph [ref=e149]: DataSeed reads your table names and field shapes, infers the business domain, and generates field values that fit — IBANs in finance, blood types in medical, SKUs in commerce.
+      - generic [ref=e150]:
+        - img "Domain-aware data generation across medical, e-commerce, CRM, and finance" [ref=e153]
+        - generic [ref=e154]:
+          - generic [ref=e155]:
+            - img [ref=e157]
+            - generic [ref=e161]:
+              - heading "Multi-format schema parsing" [level=3] [ref=e162]
+              - paragraph [ref=e163]:
+                - text: Same engine reads
+                - code [ref=e164]: schema.prisma
+                - text: ","
+                - code [ref=e165]: pgTable()
+                - text: from Drizzle,
+                - code [ref=e166]: z.object()
+                - text: ", OpenAPI 3, and raw"
+                - code [ref=e167]: CREATE TABLE
+                - text: . Format auto-detected on upload.
+          - generic [ref=e168]:
+            - img [ref=e170]
+            - generic [ref=e173]:
+              - heading "Rich Postgres types" [level=3] [ref=e174]
+              - paragraph [ref=e175]:
+                - code [ref=e176]: vector(1536)
+                - text: for pgvector,
+                - code [ref=e177]: geo-point
+                - text: for PostGIS,
+                - code [ref=e178]: jsonb
+                - text: ","
+                - code [ref=e179]: inet
+                - text: ","
+                - code [ref=e180]: bytea
+                - text: ","
+                - code [ref=e181]: interval
+                - text: ", custom enums."
+          - generic [ref=e182]:
+            - img [ref=e184]
+            - generic [ref=e194]:
+              - heading "Domain awareness" [level=3] [ref=e195]
+              - paragraph [ref=e196]: Healthcare → real ICD-10 specialties. E-commerce → realistic SKUs and price points. Finance → valid IBAN/SWIFT. CRM → coherent companies and contacts.
+          - generic [ref=e197]:
+            - img [ref=e199]
+            - generic [ref=e202]:
+              - heading "Deterministic by seed" [level=3] [ref=e203]
+              - paragraph [ref=e204]: Same input + same seed = same dataset. Bit-for-bit reproducible CI fixtures.
+    - generic [ref=e206]:
+      - generic [ref=e207]:
+        - paragraph [ref=e208]: MCP-native
+        - heading "Your agent calls it, not you." [level=2] [ref=e209]
+        - paragraph [ref=e210]: DataSeed ships a Model Context Protocol server. Cursor, Claude Code, Windsurf, and OpenAI Codex can analyse schemas and seed databases as a tool — no plugin, no glue code.
+      - generic [ref=e211]:
+        - img "AI agents connected to the DataSeed MCP infrastructure" [ref=e214]
+        - generic [ref=e215]:
+          - generic [ref=e216]:
+            - generic [ref=e217]:
+              - generic [ref=e220]: claude mcp add
+              - generic [ref=e221]:
+                - generic [ref=e222]: MCP
+                - generic [ref=e223]: bash
+            - code [ref=e225]: "# Add DataSeed to Claude Code claude mcp add dataseed \\ --url https://api.dataseed.dev/api/mcp \\ --api-key ds_live_... # Available tools: # analyze_schema → returns tables, FKs, columns # generate_seed → returns SQL/JSON/CSV # insert_into_db → topological insert # list_presets → user-saved configs"
+          - generic [ref=e226]:
+            - generic [ref=e227]:
+              - generic [ref=e228]: Cursor
+              - generic [ref=e229]: supported
+            - generic [ref=e230]:
+              - generic [ref=e231]: Claude Code
+              - generic [ref=e232]: supported
+            - generic [ref=e233]:
+              - generic [ref=e234]: Windsurf
+              - generic [ref=e235]: supported
+    - generic [ref=e238]:
+      - generic [ref=e239]:
+        - generic [ref=e240]:
+          - paragraph [ref=e241]: cURL · JS · Python
+          - heading "One POST. Done." [level=2] [ref=e242]
+          - paragraph [ref=e243]: No SDK, no auth dance, no glue. Drop it into your seed script, your CI pipeline, your agent's tool list.
+        - list [ref=e244]:
+          - listitem [ref=e245]:
+            - img [ref=e246]
+            - text: Up to 100k rows per call, streamed NDJSON for the big ones
+          - listitem [ref=e248]:
+            - img [ref=e249]
+            - text: Per-table row counts, per-column overrides, persona profiles
+          - listitem [ref=e251]:
+            - img [ref=e252]
+            - text: Same JSON contract across every output format
+          - listitem [ref=e254]:
+            - img [ref=e255]
+            - text: Direct injection — Postgres / Supabase / Neon
+        - generic [ref=e257]:
+          - link "Try it live" [ref=e258] [cursor=pointer]:
+            - /url: /playground
+            - text: Try it live
+            - img
+          - link "View the docs" [ref=e259] [cursor=pointer]:
+            - /url: /docs
+      - generic [ref=e260]:
+        - generic [ref=e261]:
+          - generic [ref=e264]: seed.ts
+          - generic [ref=e265]:
+            - generic [ref=e266]: REQUEST
+            - generic [ref=e267]: ts
+        - code [ref=e269]: "import { readFileSync } from \"fs\"; const schema = readFileSync(\"schema.prisma\", \"utf8\"); const res = await fetch(\"https://api.dataseed.dev/v1/generate\", { method: \"POST\", headers: { \"Content-Type\": \"application/json\", \"X-API-Key\": process.env.DATASEED_KEY!, }, body: JSON.stringify({ input: { type: \"auto\", files: [{ name: \"schema.prisma\", content: schema }] }, output: { format: \"sql\", sql_dialect: \"postgres\" }, options:{ rowsPerTable: { User: 50, Post: { perParent: 5, parent: \"User\" } }, assets: { avatars: \"dicebear\" }, locale: \"fr\", seed: 42, }, }), }); const { output, report } = await res.json(); console.log(`✓ ${report.totalRows} rows in ${report.durationMs}ms`);"
+    - generic [ref=e272]:
+      - generic [ref=e273]:
+        - img [ref=e275]
+        - heading "SHA-256 keys" [level=3] [ref=e277]
+        - paragraph [ref=e278]: Hashed at rest, scoped per workspace, rotatable, audit-logged.
+      - generic [ref=e279]:
+        - img [ref=e281]
+        - heading "Edge runtime" [level=3] [ref=e284]
+        - paragraph [ref=e285]: Sub-100ms cold start. Streams over HTTP for million-row jobs.
+      - generic [ref=e286]:
+        - img [ref=e288]
+        - heading "Topological inserts" [level=3] [ref=e292]
+        - paragraph [ref=e293]: Parents first, children second. Zero orphan rows, ever.
+      - generic [ref=e294]:
+        - img [ref=e296]
+        - heading "Quota & rate-limit" [level=3] [ref=e298]
+        - paragraph [ref=e299]: Per-key budgets, per-minute caps, monthly counters.
+    - generic [ref=e302]:
+      - heading "Stop hand-writing fixtures. Ship realistic demos." [level=2] [ref=e303]
+      - paragraph [ref=e304]: 30 seconds to a free key. Two minutes to your first 10,000 rows. A whole afternoon back to building actual features.
+      - generic [ref=e305]:
+        - link "Create your free account" [ref=e308] [cursor=pointer]:
+          - /url: /signup
+          - text: Create your free account
+          - img
+        - link "Try without signup" [ref=e311] [cursor=pointer]:
+          - /url: /playground
+    - contentinfo [ref=e312]:
+      - generic [ref=e313]:
+        - generic [ref=e314]:
+          - generic [ref=e315]:
+            - generic [ref=e316]:
+              - img [ref=e318]
+              - generic [ref=e322]: DataSeed
+            - paragraph [ref=e323]: The seed-data infrastructure for code agents and engineering teams who care about realism.
+            - generic [ref=e324]:
+              - link [ref=e325] [cursor=pointer]:
+                - /url: https://github.com
+                - img [ref=e326]
+              - link [ref=e329] [cursor=pointer]:
+                - /url: https://twitter.com
+                - img [ref=e330]
+          - generic [ref=e332]:
+            - heading "Product" [level=3] [ref=e333]
+            - list [ref=e334]:
+              - listitem [ref=e335]:
+                - link "Playground" [ref=e336] [cursor=pointer]:
+                  - /url: /playground
+              - listitem [ref=e337]:
+                - link "Documentation" [ref=e338] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=e339]:
+                - link "API reference" [ref=e340] [cursor=pointer]:
+                  - /url: /api-reference
+              - listitem [ref=e341]:
+                - link "Changelog" [ref=e342] [cursor=pointer]:
+                  - /url: /changelog
+          - generic [ref=e343]:
+            - heading "Developers" [level=3] [ref=e344]
+            - list [ref=e345]:
+              - listitem [ref=e346]:
+                - link "MCP server" [ref=e347] [cursor=pointer]:
+                  - /url: /mcp
+              - listitem [ref=e348]:
+                - link "REST API" [ref=e349] [cursor=pointer]:
+                  - /url: /rest-api
+              - listitem [ref=e350]:
+                - link "Schema formats" [ref=e351] [cursor=pointer]:
+                  - /url: /schema-formats
+              - listitem [ref=e352]:
+                - link "Examples" [ref=e353] [cursor=pointer]:
+                  - /url: /examples
+          - generic [ref=e354]:
+            - heading "Resources" [level=3] [ref=e355]
+            - list [ref=e356]:
+              - listitem [ref=e357]:
+                - link "Pricing" [ref=e358] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e359]:
+                - link "Security" [ref=e360] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e361]:
+                - link "Status" [ref=e362] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e363]:
+                - link "Support" [ref=e364] [cursor=pointer]:
+                  - /url: /
+          - generic [ref=e365]:
+            - heading "Company" [level=3] [ref=e366]
+            - list [ref=e367]:
+              - listitem [ref=e368]:
+                - link "About" [ref=e369] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e370]:
+                - link "Customers" [ref=e371] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e372]:
+                - link "Contact" [ref=e373] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e374]:
+                - link "Legal" [ref=e375] [cursor=pointer]:
+                  - /url: /
+        - generic [ref=e376]:
+          - generic [ref=e377]: © 2026 DataSeed. Built for engineers and agents.
+          - generic [ref=e378]:
+            - generic [ref=e379]: Privacy
+            - generic [ref=e380]: Terms
+            - generic [ref=e381]: SOC 2 (in progress)
+  - region "Notifications alt+T"

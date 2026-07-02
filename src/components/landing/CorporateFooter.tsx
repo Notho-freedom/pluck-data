@@ -7,23 +7,23 @@ const COLS: { title: string; links: { label: string; to: string; external?: bool
     links: [
       { label: "Playground", to: "/playground" },
       { label: "Documentation", to: "/docs" },
-      { label: "API reference", to: "/docs" },
-      { label: "Changelog", to: "/docs" },
+      { label: "API reference", to: "/api-reference" },
+      { label: "Changelog", to: "/changelog" },
     ],
   },
   {
     title: "Developers",
     links: [
-      { label: "MCP server", to: "/docs" },
-      { label: "REST API", to: "/docs" },
-      { label: "Schema formats", to: "/docs" },
-      { label: "Examples", to: "/docs" },
+      { label: "MCP server", to: "/mcp" },
+      { label: "REST API", to: "/rest-api" },
+      { label: "Schema formats", to: "/schema-formats" },
+      { label: "Examples", to: "/examples" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Pricing", to: "/" },
+      { label: "Pricing", to: "/pricing" },
       { label: "Security", to: "/" },
       { label: "Status", to: "/" },
       { label: "Support", to: "/" },
@@ -32,7 +32,7 @@ const COLS: { title: string; links: { label: string; to: string; external?: bool
   {
     title: "Company",
     links: [
-      { label: "About", to: "/" },
+      { label: "About", to: "/about" },
       { label: "Customers", to: "/" },
       { label: "Contact", to: "/" },
       { label: "Legal", to: "/" },
@@ -48,7 +48,13 @@ export function CorporateFooter() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5">
               <span className="grid h-8 w-8 place-items-center rounded-md bg-gradient-to-br from-primary to-primary/60 text-primary-foreground">
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
                   <ellipse cx="12" cy="5" rx="9" ry="3" />
                   <path d="M3 5v6c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
                   <path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6" />
@@ -57,15 +63,24 @@ export function CorporateFooter() {
               <span className="font-semibold tracking-tight">DataSeed</span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              The seed-data infrastructure for code agents and engineering teams who care about realism.
+              The seed-data infrastructure for code agents and engineering teams who care about
+              realism.
             </p>
             <div className="mt-5 flex items-center gap-2">
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer"
-                className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition-colors hover:text-foreground">
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition-colors hover:text-foreground"
+              >
                 <Github className="h-4 w-4" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
-                className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition-colors hover:text-foreground">
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition-colors hover:text-foreground"
+              >
                 <Twitter className="h-4 w-4" />
               </a>
             </div>
@@ -73,11 +88,16 @@ export function CorporateFooter() {
 
           {COLS.map((col) => (
             <div key={col.title}>
-              <h3 className="text-xs font-mono uppercase tracking-[0.16em] text-foreground/70">{col.title}</h3>
+              <h3 className="text-xs font-mono uppercase tracking-[0.16em] text-foreground/70">
+                {col.title}
+              </h3>
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <Link to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    <Link
+                      to={l.to}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
                       {l.label}
                     </Link>
                   </li>
