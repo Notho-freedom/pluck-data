@@ -2,9 +2,7 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { AppSidebar } from "@/components/app/AppSidebar";
-import { AppTopbar } from "@/components/app/AppTopbar";
-import { AppMobileNav } from "@/components/app/AppMobileNav";
+import { ConsoleShell } from "@/components/console/ConsoleShell";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthGate,
@@ -32,15 +30,8 @@ function AuthGate() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppSidebar />
-      <div className="lg:pl-60">
-        <AppTopbar />
-        <div className="pb-20 lg:pb-0">
-          <Outlet />
-        </div>
-      </div>
-      <AppMobileNav />
-    </div>
+    <ConsoleShell>
+      <Outlet />
+    </ConsoleShell>
   );
 }

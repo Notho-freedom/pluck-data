@@ -2,14 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Copy, Trash2, Plus, Loader2 } from "lucide-react";
+import { Copy, Trash2, Plus, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { listApiKeys, createApiKey, revokeApiKey } from "@/lib/keys.functions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/keys")({
   head: () => ({ meta: [{ title: "API keys — DataSeed" }] }),
@@ -38,74 +34,120 @@ function KeysPage() {
 
   const del = useMutation({
     mutationFn: (id: string) => revoke({ data: { id } }),
-    onSuccess: () => {
-      toast.success("Key revoked");
-      qc.invalidateQueries({ queryKey: ["keys"] });
-    },
+    onSuccess: () => { toast.success("Key revoked"); qc.invalidateQueries({ queryKey: ["keys"] }); },
   });
 
+  const active = (keys ?? []).filter((k: any) => !k.revoked_at);
+  const revoked = (keys ?? []).filter((k: any) => k.revoked_at);
+
   return (
-    <main className="mx-auto max-w-4xl px-6 py-8">
-      <h1 className="text-2xl font-bold tracking-tight">API keys</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Use the <code>X-API-Key</code> header. Each key is shown once at creation.
-      </p>
+    <main className="mx-auto max-w-5xl px-6">
+      <header className="flex items-baseline justify-between border-b border-border/40 pb-6">
+        <div>
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted-foreground/70">Console / Keys</p>
+          <h1 className="mt-3 font-display text-[52px] leading-none tracking-tight sm:text-[72px]">
+            {active.length}<span className="ml-3 align-top font-sans text-[13px] uppercase tracking-[0.14em] text-muted-foreground">active</span>
+          </h1>
+          <p className="mt-4 max-w-xl text-[13.5px] text-muted-foreground">
+            Each key is hashed with SHA-256, scoped to this workspace, rate-limited by plan, revocable in one click. Shown once at creation.
+          </p>
+        </div>
+      </header>
 
-      <Card className="mt-6">
-        <CardHeader><CardTitle>Create a key</CardTitle></CardHeader>
-        <CardContent className="flex gap-2">
-          <Input placeholder="e.g. production seeds" value={name} onChange={(e) => setName(e.target.value)} />
-          <Button onClick={() => create.mutate()} disabled={!name || create.isPending}>
-            {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Plus className="mr-1.5 h-4 w-4" />Create</>}
-          </Button>
-        </CardContent>
-      </Card>
+      {/* inline create — no card */}
+      <section className="mt-10 flex items-end gap-3 border-b border-border/40 pb-8">
+        <div className="flex-1">
+          <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">Name this key</label>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. production seeds, staging fixtures, cursor-agent"
+            className="mt-2 h-10 border-0 border-b border-border/60 bg-transparent px-0 text-[15px] focus-visible:border-primary focus-visible:ring-0"
+          />
+        </div>
+        <button
+          onClick={() => create.mutate()}
+          disabled={!name || create.isPending}
+          className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-5 text-[13px] font-medium text-primary-foreground shadow-glow transition-opacity hover:opacity-90 disabled:opacity-50"
+        >
+          {create.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+          Mint key
+        </button>
+      </section>
 
-      <Card className="mt-6">
-        <CardHeader><CardTitle>Your keys</CardTitle></CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12" />)}</div>
-          ) : keys && keys.length > 0 ? (
-            <ul className="divide-y">
-              {keys.map((k: any) => (
-                <li key={k.id} className="flex items-center justify-between py-3">
-                  <div>
-                    <div className="font-medium">{k.name}</div>
-                    <div className="text-xs text-muted-foreground font-mono">{k.key_prefix}…{k.revoked_at ? " · revoked" : ""}</div>
-                  </div>
-                  {!k.revoked_at && (
-                    <Button variant="ghost" size="sm" onClick={() => del.mutate(k.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="py-4 text-sm text-muted-foreground">No keys yet.</p>
-          )}
-        </CardContent>
-      </Card>
+      {/* keys list */}
+      <section className="mt-10">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">Your keys</h2>
+        {isLoading ? (
+          <div className="mt-4 space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-14 animate-pulse rounded-sm bg-muted/30" />
+            ))}
+          </div>
+        ) : (keys ?? []).length === 0 ? (
+          <p className="mt-6 font-mono text-[12.5px] text-muted-foreground">No keys yet. Mint one above.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-border/40">
+            {active.map((k: any) => (
+              <KeyRow key={k.id} k={k} onRevoke={() => del.mutate(k.id)} />
+            ))}
+            {revoked.length > 0 && (
+              <>
+                <li className="pt-6 font-mono text-[10.5px] uppercase tracking-[0.18em] text-muted-foreground/60">Revoked</li>
+                {revoked.map((k: any) => (
+                  <KeyRow key={k.id} k={k} muted />
+                ))}
+              </>
+            )}
+          </ul>
+        )}
+      </section>
 
-      <Dialog open={!!createdKey} onOpenChange={(o) => !o && setCreatedKey(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Save your API key</DialogTitle>
-            <DialogDescription>This is the only time you'll see this key. Copy it now.</DialogDescription>
-          </DialogHeader>
-          <pre className="rounded-md border bg-muted p-3 font-mono text-xs break-all">{createdKey}</pre>
-          <DialogFooter>
-            <Button onClick={async () => {
-              if (createdKey) await navigator.clipboard.writeText(createdKey);
-              toast.success("Copied");
-            }}>
-              <Copy className="mr-1.5 h-4 w-4" /> Copy
-            </Button>
-            <Button variant="outline" onClick={() => setCreatedKey(null)}>Done</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Slide-in overlay from top when key is created */}
+      {createdKey && (
+        <div className="fixed inset-x-0 top-0 z-40 animate-[slide-in-right_.35s_ease-out] border-b border-primary/40 bg-[oklch(0.14_0.02_155)]/95 shadow-elevated backdrop-blur-xl">
+          <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-4 px-6 py-6">
+            <div className="flex-1">
+              <p className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-primary">Save this key — one-time reveal</p>
+              <code className="mt-2 block overflow-x-auto font-mono text-[13px] text-foreground">{createdKey}</code>
+            </div>
+            <button
+              onClick={async () => { await navigator.clipboard.writeText(createdKey); toast.success("Copied"); }}
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-[12px] font-medium text-primary-foreground"
+            >
+              <Copy className="h-3.5 w-3.5" /> Copy
+            </button>
+            <button
+              onClick={() => setCreatedKey(null)}
+              className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:text-foreground"
+              aria-label="Dismiss"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </main>
+  );
+}
+
+function KeyRow({ k, onRevoke, muted }: { k: any; onRevoke?: () => void; muted?: boolean }) {
+  return (
+    <li className={`flex items-center gap-4 py-4 ${muted ? "opacity-50" : ""}`}>
+      <div className="flex-1">
+        <div className="text-[14px] font-medium">{k.name}</div>
+        <div className="mt-0.5 font-mono text-[11px] text-muted-foreground">
+          {k.key_prefix}…  ·  minted {new Date(k.created_at).toLocaleDateString()}
+        </div>
+      </div>
+      {onRevoke && (
+        <button
+          onClick={onRevoke}
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-destructive"
+        >
+          <Trash2 className="h-3 w-3" /> revoke
+        </button>
+      )}
+    </li>
   );
 }
